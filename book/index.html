@@ -1,0 +1,257 @@
+<!DOCTYPE HTML>
+<html lang="ch" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Lab 介绍 - toni-lsm-lab</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">toni-lsm-lab</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="toni-lsm-lab"><a class="header" href="#toni-lsm-lab">Toni-LSM Lab</a></h1>
+<p><img src="./logo/logo1-compact.jpg" alt="logo" /></p>
+<hr />
+<h1 id="0-toni-lsm是什么"><a class="header" href="#0-toni-lsm是什么">0 Toni-LSM是什么?</a></h1>
+<p><a href="https://github.com/ToniXWD/toni-lsm">Toni-LSM</a>是一个基于<code>LSM Tree</code>的开源教学<code>KV</code>存储引擎, 除<code>LSM Tree</code>的基础功能外, 还支持<code>MVCC</code>、<code>WAL</code>、崩溃恢复、<code>Redis</code>兼容等功能。本实验是基于作者原本实验的代码进行改造后的<code>Lab</code>课程。</p>
+<p><code>LSM Tree</code>（<code>Log-Structured Merge-Tree</code>）是一种适用于磁盘存储的数据结构，特别适合于需要高吞吐量的写操作的场景。它由Patrick O'Neil等人于1996年提出，广泛应用于NoSQL数据库和文件系统中，如<code>LevelDB</code>、<code>RocksDB</code>和<code>Cassandra</code>等。<code>LSM Tree</code>的主要思想是将数据写入操作日志（Log），然后定期将日志中的数据合并到磁盘上的有序不可变文件（SSTable）中。这些SSTable文件按层次结构组织，数据在多个层次之间逐步合并和压缩，以减少读取时的查找次数和磁盘I/O操作。</p>
+<p>有关<code>LSM Tree</code>的进一步背景和介绍请参见<a href="lab0-background.html">LSM Tree 概览</a></p>
+<p>本实现项目<code>Toni-LSN</code>完成了包括<code>内存表（MemTable）</code>、<code>不可变表（SSTable）</code>、<code>布隆过滤器（Bloom Filter）</code>、<code>合并和压缩（Compaction）</code>等<code>LSM Tree</code>的核心组件，并在此基础上添加了额外的功能博客, 包括:</p>
+<ul>
+<li>实现了<code>ACID</code>事务</li>
+<li>实现了<code>MVCC</code>多版本并发控制</li>
+<li>实现了<code>WAL</code>日志和崩溃恢复</li>
+<li>基于<code>KV</code>存储实现了<code>Redis</code>的<code>Resp</code>协议兼容层</li>
+<li>基于<code>Resp</code>协议兼容层实现了<code>redis-server</code>服务</li>
+</ul>
+<h3 id="-请支持我们的项目"><a class="header" href="#-请支持我们的项目">⭐ 请支持我们的项目！</a></h3>
+<blockquote>
+<p>如果您觉得本<code>Lab</code>不错, 请为<a href="https://github.com/ToniXWD/toni-lsm">Toni-LSM</a>点一个⭐。项目实验制作耗费了我很大精力，作者非常需要您的鼓励❤️, 您的支持是我更新的动力😆</p>
+</blockquote>
+<h1 id="1-本实验的目的是什么"><a class="header" href="#1-本实验的目的是什么">1 本实验的目的是什么?</a></h1>
+<p>本实验的最终目标是实现一个基于<code>LSM Tree</code>的单机<code>KV Store</code>引擎。其功能包括:</p>
+<ol>
+<li>基本的<code>KV</code>存储功能，包括<code>put</code>、<code>get</code>、<code>remove</code>等。</li>
+<li>持久化功能，构建的存储引擎的数据将持久化到磁盘中。</li>
+<li>事务功能，构建的存储引擎将支持<code>ACID</code>等基本事务特性</li>
+<li><code>MVCC</code>, 构建的存储引擎将支持<code>MVCC</code>对数据进行查询。</li>
+<li><code>WAL</code>与崩溃恢复, 数据写入前会先预写到<code>WAL</code>日志以支持崩溃恢复</li>
+<li><code>Redis</code>兼容, 本实验将实现<code>Redis</code>的<code>Resp</code>兼容层, 作为<code>Redis</code>后端。</li>
+</ol>
+<h1 id="2-本实验适合哪些人"><a class="header" href="#2-本实验适合哪些人">2 本实验适合哪些人？</a></h1>
+<p>通过本实验，你可以学习到<code>LSM Tree</code>这一工业界广泛使用的<code>KV</code>存储架构, 适合数据库、存储领域的入门学习者。同时本实验包含了<code>Redis</code>的<code>Resp</code>协议兼容层、网络服务器搭建等内容，也适合后端开发的求职者。同时，本项目使用<code>C++ 17</code>特性, 使用<code>Xmake</code>作为构建工具，并具备完善的单元测试，也适合想通过项目进一步学习现代<code>C++</code>的同学。</p>
+<h1 id="3-本实验的前置知识"><a class="header" href="#3-本实验的前置知识">3 本实验的前置知识？</a></h1>
+<p>本项目的知识包括：</p>
+<ol>
+<li><strong>(必备)</strong>: 到<code>C++17</code>为止的常见<code>C++</code>新特性，（项目的配置文件指定的标准为<code>C++20</code>, 但其只在单元测试中使用, 项目核心代码只要求<code>C++17</code>即可）</li>
+<li><strong>(必备)</strong>：常见的数据结构与算法知识</li>
+<li><strong>(建议)</strong>: 数据库的基本知识，包括事务特性、<code>MVCC</code>的基本概念</li>
+<li><strong>(建议)</strong>: <code>Linux</code>系统编程知识，本实验使用了系统底层的<code>mmap</code>等IO相关的系统调用</li>
+<li><strong>(可选)</strong>：<code>Xmake</code>的使用, 本实验的构建工具为<a href="https://xmake.io/#/zh-cn/"><code>Xmake</code></a>, 若你想自定义单元测试或引入别的库, 需要手动在<code>Xmake</code>中配置。</li>
+<li><strong>(可选)</strong>: <code>Redis</code>基本知识, 本实验将利用<code>kv</code>存储接口实现<code>Redis</code>后端, 熟悉<code>Redis</code>有助于实验的理解。</li>
+<li><strong>(可选)</strong>: 单元测试框架<code>gtest</code>的使用, 如果你想自定义单元测试, 需要自行改配置。</li>
+</ol>
+<h1 id="4-实验流程"><a class="header" href="#4-实验流程">4 实验流程</a></h1>
+<p>本实验的组织类似<a href="https://github.com/cmu-db/bustub"><code>CMU15445 bustub</code></a>, <code>Lab</code>提供了整体的代码框架, 并将其中某些组件的关键函数挖空并标记为<code>TODO</code>, 参与<code>Lab</code>的同学需要按照每一个<code>Lab</code>的指南补全缺失的函数, 并通过对应的单元测试。</p>
+<p>同样类似<code>CMU 15445</code>, 后面的<code>Lab</code>依赖于前一个<code>Lab</code>的正确性, 而实验提供的单元测试知识尽量考虑到了各种边界情况, 但不能完全确保你的代码正确, 因此必要时, 你需要自行进行单元测试补充以及<code>debug</code>。</p>
+<blockquote>
+<p>在目前的<code>Lab</code>中, 你确实可以从原仓库<a href="https://github.com/ToniXWD/toni-lsm">Toni-LSM</a>的<code>complete</code>分支直接查看<code>Lab</code>实验的答案, 但作者不希望你如此做, 这样你将无法深刻理解实验设计的思路和相关知识。</p>
+</blockquote>
+<p>在了解完这些以后, 你可以开启下一章<a href="./lab0-env.html">Lab 0 环境准备</a>的学习。</p>
+<h1 id="5-项目交流与讨论"><a class="header" href="#5-项目交流与讨论">5 项目交流与讨论</a></h1>
+<p>如果你对本<code>Lab</code>有疑问, 欢迎在<a href="https://github.com/ToniXWD/toni-lsm/issues">GitHub Issues</a>中提出问题。也欢迎加入次实验的<a href="https://qm.qq.com/q/wDZQfaNNw6">QQ讨论群</a> 。如果你想参与<code>Lab</code>的开发, 欢迎通过QQ群或者作者邮件: xwdtoni@126.com 联系。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+                            <a rel="next prefetch" href="lab0-background.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+                    <a rel="next prefetch" href="lab0-background.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

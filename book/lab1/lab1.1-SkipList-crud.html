@@ -1,0 +1,343 @@
+<!DOCTYPE HTML>
+<html lang="ch" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Lab 1.1 跳表的 CRUD - toni-lsm-lab</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">toni-lsm-lab</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="1-准备工作"><a class="header" href="#1-准备工作">1 准备工作</a></h1>
+<p>本<code>Lab</code>中, 你需要修改的代码文件为</p>
+<ul>
+<li><code>src/skiplist/skipList.cpp</code></li>
+<li><code>include/skiplist/skiplist.h</code> (optional)</li>
+</ul>
+<p>这里首先简单介绍本<code>Lab</code>已有的<code>SkipList</code>头文件定义:</p>
+<pre><code class="language-cpp">// include/skiplist/skiplist.h
+struct SkipListNode {
+  std::string key_;   // 节点存储的键
+  std::string value_; // 节点存储的值
+  uint64_t tranc_id_; // 事务 id, 目前可以忽略
+  std::vector&lt;std::shared_ptr&lt;SkipListNode&gt;&gt;
+      forward_; // 指向不同层级的下一个节点的指针数组
+  std::vector&lt;std::weak_ptr&lt;SkipListNode&gt;&gt;
+      backward_; // 指向不同层级的下一个节点的指针数组
+  // ...
+};
+</code></pre>
+<p>这里定义了跳表节点的基础数据, 包括<code>key</code>, <code>value</code>和目前可以忽略的事务<code>tranc_id_</code></p>
+<p>这里定义的跳表节点使用的是双向链表, <code>forward_</code>和<code>backward_</code>分别存储了各层链表节点的前向指针和后向指针, 其中为了避免循环引用, 这里结合使用了<code>weak_ptr</code>和<code>shared_ptr</code>, 详细熟悉现代<code>C++</code>的同学对此非常熟悉。</p>
+<blockquote>
+<p>这里补充说明一下<code>weak_ptr</code>, 它的作用是避免<code>shared_ptr</code>循环引用, 即一个节点的<code>shared_ptr</code>指针指向另一个节点, 另一个节点的<code>shared_ptr</code>指针指向前者, 这样就会造成两个节点的析构都无法进行, 因为在析构时互相持有对方的引用计数, 类似死锁。但<code>weak_ptr</code>不参与类似<code>shared_ptr</code>的引用计数, 保证了析构的正确进行。但也正因为如此，<code>weak_ptr</code>不保证指针的有效性, 需要想使用<code>.lock()</code>判断该指针是否有效。</p>
+</blockquote>
+<p>然后我们看<code>SkipList</code>的头文件定义：</p>
+<pre><code class="language-cpp">
+class SkipList {
+private:
+  std::shared_ptr&lt;SkipListNode&gt;
+      head;              // 跳表的头节点，不存储实际数据，用于遍历跳表
+  int max_level;         // 跳表的最大层级数，限制跳表的高度
+  int current_level;     // 跳表当前的实际层级数，动态变化
+  size_t size_bytes = 0; // 跳表当前占用的内存大小（字节数），用于跟踪内存使用
+  // std::shared_mutex rw_mutex; // ! 目前看起来这个锁是冗余的, 在上层控制即可,
+  // 后续考虑是否需要细粒度的锁
+
+  std::uniform_int_distribution&lt;&gt; dis_01;  // 随机层数的辅助生成器
+  std::uniform_int_distribution&lt;&gt; dis_level;
+  std::mt19937 gen;
+};
+</code></pre>
+<p>这里我们定义了最大的链表层数<code>max_level</code>, 你的实现不能有超过<code>max_level</code>的链表数量, <code>current_level</code>定义当前链表的层数(注意是层数, 不是索引), 最后介绍最重要的<code>head</code>, 其只是个哨兵节点, 并不实际存储键值对。</p>
+<p>后面三行的<code>gen</code>和<code>dis_01</code>和<code>dis_level</code>是随机数生成器，你可以使用它们来生成随机数。回想我们之前提到的问题, 你应该如何确定每一此插入节点时起最高的连接链表的<code>Level</code>呢? 这里你可以利用这些随机生成器来确定这些层数, 当然你也可以选择自己的方式来实现。</p>
+<h1 id="2-put-的实现"><a class="header" href="#2-put-的实现">2 put 的实现</a></h1>
+<p>你需要实现下面的<code>put</code>函数:</p>
+<pre><code class="language-cpp">// 插入或更新键值对
+void SkipList::put(const std::string &amp;key, const std::string &amp;value,
+                   uint64_t tranc_id) {
+  spdlog::trace("SkipList--put({}, {}, {})", key, value, tranc_id);
+
+  // TODO: Lab1.1  任务：实现插入或更新键值对
+  // ? Hint: 你需要保证不同`Level`的步长从底层到高层逐渐增加
+  // ? 你可能需要使用到`random_level`函数以确定层数, 其注释中为你通公路一种思路
+}
+</code></pre>
+<p>目前, 你可以先忽略<code>tranc_id</code>这个参数。</p>
+<p>此外，之前提到过，跳表的层数是动态增加的， 因此你实现下面的函数可能对你有帮助：</p>
+<pre><code class="language-cpp">int SkipList::random_level() {
+  // TODO: 实现随机生成level函数
+  // 通过"抛硬币"的方式随机生成层数：
+  // - 每次有50%的概率增加一层
+  // - 确保层数分布为：第1层100%，第2层50%，第3层25%，以此类推
+  // - 层数范围限制在[1, max_level]之间，避免浪费内存
+  return -1;
+}
+</code></pre>
+<p>这里给出一个提示, 生成的整型值的每一个二级制位只包含0或1, 可以表示为<code>bool</code>类型, 因此你可以利用它来判断这个节点的最高层数:</p>
+<ol>
+<li><code>Level 0</code>底层链表: 一定连接新节点</li>
+<li><code>Level 1</code>链表: 判断<code>random_level()</code>生成整型数的第1位是否为1, 有<code>50%</code>的概率连接新节点, 为0则跳出该判断链</li>
+<li><code>Level 2</code>链表: 判断<code>random_level()</code>生成整型数的第2位是否为1, 有<code>50% * 50% =25%</code>的概率连接新节点, 为0则跳出该判断链</li>
+<li>...</li>
+</ol>
+<blockquote>
+<p>当然, 上述只是一个建议的方案, 你可以选择别的实现方案, 并删除<code>random_level</code>函数
+另外, 别忘记了更新<code>size_bytes</code>这个统计信息, 如果你不知道这个统计信息的运作规则, 你可以查看单元测试<code>SkipListTest.MemorySizeTracking</code></p>
+</blockquote>
+<h1 id="3-remove-的实现"><a class="header" href="#3-remove-的实现">3 remove 的实现</a></h1>
+<p>虽然我们的<code>LSM Tree</code>是以仅追加写入的方式使用我们的<code>SkipList</code>, 但为了这个数据结构的完整性, 也是一次手搓底层跳表的体验, 你需要实现正儿八经的<code>remove</code>函数:</p>
+<pre><code class="language-cpp">// 删除键值对
+// ! 这里的 remove 是跳表本身真实的 remove,  lsm 应该使用 put 空值表示删除,
+// ! 这里只是为了实现完整的 SkipList 不会真正被上层调用
+void SkipList::remove(const std::string &amp;key) {
+  // TODO: Lab1.1 任务：实现删除键值对
+}
+</code></pre>
+<p><code>remove</code>函数的实现的第一步是查询到指定的节点位置, 因此你可以尝试先实现<code>get</code>函数。</p>
+<h1 id="4-get-实现"><a class="header" href="#4-get-实现">4 get 实现</a></h1>
+<p>接下来实现<code>get</code>函数:</p>
+<pre><code class="language-cpp">// 查找键值对
+SkipListIterator SkipList::get(const std::string &amp;key, uint64_t tranc_id) {
+  // spdlog::trace("SkipList--get({}) called", key);
+  // ? 你可以参照上面的注释完成日志输出以便于调试
+  // ? 日志为输出到你执行二进制所在目录下的log文件夹
+
+  // TODO: Lab1.1 任务：实现查找键值对,
+  // TODO: 并且你后续需要额外实现SkipListIterator中的TODO部分(Lab1.2)
+  return SkipListIterator{};
+}
+</code></pre>
+<p>可以看到, 我们的<code>get</code>返回的是一个<code>SkipListIterator</code>, 它是一个迭代器, 可以用来遍历<code>SkipList</code>中的元素。这一部分涉及<code>SkipList Iterator</code>的实现不会在文档中进行展开, 你需要阅读源码, 这也是一项基本能力(这部分代码很简单, 别怕:smile:)</p>
+<blockquote>
+<p>这里的迭代器调用构造函数就可以了, 目前的<code>SkipListIterator</code>实现了一部分, 关于自增等运算符重载, 你将在后续的任务中实现。</p>
+</blockquote>
+<h1 id="4-测试"><a class="header" href="#4-测试">4 测试</a></h1>
+<p>当你完成上述操作后, <code>test/test_skiplist.cpp</code>中的部分单元测试你应该能够通过:</p>
+<pre><code class="language-bash">✗ cd toni-lsm
+✗ xmake
+✗ xmake run test_skiplist
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from SkipListTest
+[ RUN      ] SkipListTest.BasicOperations
+[       OK ] SkipListTest.BasicOperations (0 ms)
+[ RUN      ] SkipListTest.LargeScaleInsertAndGet
+[       OK ] SkipListTest.LargeScaleInsertAndGet (6 ms)
+[ RUN      ] SkipListTest.LargeScaleRemove
+[       OK ] SkipListTest.LargeScaleRemove (6 ms)
+[ RUN      ] SkipListTest.DuplicateInsert
+[       OK ] SkipListTest.DuplicateInsert (0 ms)
+[ RUN      ] SkipListTest.EmptySkipList
+[       OK ] SkipListTest.EmptySkipList (0 ms)
+[ RUN      ] SkipListTest.RandomInsertAndRemove
+[       OK ] SkipListTest.RandomInsertAndRemove (5 ms)
+[ RUN      ] SkipListTest.MemorySizeTracking
+[       OK ] SkipListTest.MemorySizeTracking (0 ms)
+[ RUN      ] SkipListTest.Iterator
+^C
+</code></pre>
+<p>到<code>SkipListTest.Iterator</code>前的单元测试你应该都能够通过, 卡在<code>SkipListTest.Iterator</code>是因为我们很没有实现迭代器相关功能。</p>
+<p>恭喜你, 你已经完成了<code>SkipList</code>的基础<code>CRUD</code>实现。接下来你可以进行<a href="./lab1.2-Iterator-query.html">Lab1.2</a>了。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lab1/lab1-skiplist.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../lab1/lab1.2-Iterator-query.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lab1/lab1-skiplist.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../lab1/lab1.2-Iterator-query.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE HTML>
+<html lang="ch" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Lab 2.1 简单 CRUD - toni-lsm-lab</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">toni-lsm-lab</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="1-准备工作"><a class="header" href="#1-准备工作">1 准备工作</a></h1>
+<p>本小节需要你修改的代码：
+-<code>src/memtable/memtable.cpp</code></p>
+<ul>
+<li><code>include/memtable/memtable.h</code> (Optional)</li>
+</ul>
+<p>同样的，我们先看看代码的头文件东一，从而了解我们的<code>MemTable</code>的整体实现思路:</p>
+<pre><code class="language-cpp">class MemTable {
+    // ...
+private:
+  std::shared_ptr&lt;SkipList&gt; current_table;
+  std::list&lt;std::shared_ptr&lt;SkipList&gt;&gt; frozen_tables;
+  size_t frozen_bytes;
+  std::shared_mutex frozen_mtx; // 冻结表的锁
+  std::shared_mutex cur_mtx;    // 活跃表的锁
+};
+</code></pre>
+<p>这里我们根据之前的原理介绍, 对之前的<code>SkipList</code>简单包装, 使用<code>list</code>保证一系列冻结的<code>Skiplist</code>。这里建议的规定是：
+<strong>最新的<code>Skiplist</code>放在<code>list</code>的<code>head</code>位置，最旧的<code>Skiplist</code>放在<code>list</code>的<code>tail</code>位置。</strong></p>
+<p>此外, 你在头文件中除了基础的<code>CRUD</code>函数外, 还会看到这个函数:</p>
+<pre><code class="language-cpp">  std::shared_ptr&lt;SST&gt; flush_last(SSTBuilder &amp;builder, std::string &amp;sst_path,
+                                  size_t sst_id,
+                                  std::shared_ptr&lt;BlockCache&gt; block_cache);
+</code></pre>
+<p>这个函数不是本<code>Lab</code>要求实现的函数, 但可以先进行简单的介绍便于认知整体架构。当<code>MemTable</code>中的数据量达到阈值时, 会调用这个函数将最古老的一个<code>SST</code>进行持久化, 形成一个<code>Level 0</code>的<code>SST</code>, 因此你可以理解为, <code>Skiplist</code>是和<code>Level 0 SST</code>的数据来源。</p>
+<h1 id="2-put-的实现"><a class="header" href="#2-put-的实现">2 put 的实现</a></h1>
+<p>你首先要实现的是<code>put</code>系列的函数:</p>
+<pre><code class="language-cpp">void MemTable::put_(const std::string &amp;key, const std::string &amp;value,
+                    uint64_t tranc_id) {
+  // TODO: Lab2.1 无锁版本的 put
+}
+
+void MemTable::put(const std::string &amp;key, const std::string &amp;value,
+                   uint64_t tranc_id) {
+  // TODO: Lab2.1 有锁版本的 put
+}
+
+void MemTable::put_batch(
+    const std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; &amp;kvs,
+    uint64_t tranc_id) {
+  // TODO: Lab2.1 有锁版本的 put_batch
+}
+</code></pre>
+<p>这里的<code>put</code>有多个版本, 分别是无锁版本和有锁版本的单次<code>put</code>以及有锁版本的批量<code>put</code>, 你必须按照语义实现这些函数, 因为后续上层组件调用的函数默认携带<code>_</code>后缀的函数版本是无锁操作版本。</p>
+<p>同时简单讲述以下如此设计的原因，某些并发控制只需要当前的<code>MemTable</code>组件控制即可, 但有些并发控制场景设计多个组件, 需要再上层进行, 例如后续事务提交时的冲突检测就是一个典型的案例。</p>
+<blockquote>
+<p>Hint: 你不仅仅需要做简单的<code>API</code>调用, 还需要判断什么时候<code>Skiplist</code>的容量超出阈值需要进行冻结</p>
+</blockquote>
+<h1 id="3-get-的实现"><a class="header" href="#3-get-的实现">3 get 的实现</a></h1>
+<p>接下来实现<code>get</code>的一系列函数, 同样包括无锁版本与有锁版本, 并且你还需要实现不同部分的分阶段查询:</p>
+<pre><code class="language-cpp">SkipListIterator MemTable::cur_get_(const std::string &amp;key, uint64_t tranc_id) {
+  // 检查当前活跃的memtable
+  // TODO: Lab2.1 从活跃跳表中查询
+  return SkipListIterator{};
+}
+
+SkipListIterator MemTable::frozen_get_(const std::string &amp;key,
+                                       uint64_t tranc_id) {
+  // TODO: Lab2.1 从冻结跳表中查询
+  // ? 你需要尤其注意跳表的遍历顺序
+  // ? tranc_id 参数可暂时忽略, 直接插入即可
+  return SkipListIterator{};
+  ;
+}
+
+SkipListIterator MemTable::get(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab2.1 查询, 建议复用 cur_get_ 和 frozen_get_
+  // ? 注意并发控制
+
+  return SkipListIterator{};
+}
+
+SkipListIterator MemTable::get_(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab2.1 查询, 无锁版本
+}
+</code></pre>
+<h1 id="4-remove-实现"><a class="header" href="#4-remove-实现">4 remove 实现</a></h1>
+<p>最后, 插入<code>value</code>为空的键值对表示对数据的删除标记, 同样有不同的版本:</p>
+<pre><code class="language-cpp">void MemTable::remove_(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO Lab2.1 无锁版本的remove
+}
+
+void MemTable::remove(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO Lab2.1 有锁版本的remove
+}
+
+void MemTable::remove_batch(const std::vector&lt;std::string&gt; &amp;keys,
+                            uint64_t tranc_id) {
+  // TODO Lab2.1 有锁版本的remove_batch
+}
+</code></pre>
+<h1 id="5-冻结活跃表"><a class="header" href="#5-冻结活跃表">5 冻结活跃表</a></h1>
+<p><code>Skiplist</code>的容量超出阈值需要进行冻结时需要调用下述函数。</p>
+<p>至于这个函数的调用实际，作者建议是在每次<code>put</code>后检查容量是否超出阈值, 然后同步地嗲用该函数, 当然你也可以启用一个后台线程进行周期性检查。</p>
+<pre><code class="language-cpp">void MemTable::frozen_cur_table_() {
+  // TODO: 冻结活跃表
+}
+
+void MemTable::frozen_cur_table() {
+  // TODO: 冻结活跃表, 有锁版本
+}
+</code></pre>
+<blockquote>
+<p><strong><code>Hint</code></strong></p>
+<ol>
+<li><code>src/config/config.cpp</code>中定义了一个配置文件的单例, 其会解析项目目录中的<code>config.toml</code>配置文件, 其中包含了各种阈值的推荐值</li>
+<li>你可以使用类似<code>TomlConfig::getInstance().getLsmPerMemSizeLimit()</code>的方法获取配置文件中定义的常量</li>
+<li>你可以修改<code>config.toml</code>配置文件的值, 但尽量不要新增配置项, 否则你需要自行修改<code>src/config/config.cpp</code>中的解析函数</li>
+</ol>
+</blockquote>
+<h1 id="6-测试"><a class="header" href="#6-测试">6 测试</a></h1>
+<p>当你完成上述所有功能后, 你可以通过如下测试:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_memtable
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from MemTableTest
+[ RUN      ] MemTableTest.BasicOperations
+[       OK ] MemTableTest.BasicOperations (2 ms)
+[ RUN      ] MemTableTest.RemoveOperations
+[       OK ] MemTableTest.RemoveOperations (0 ms)
+[ RUN      ] MemTableTest.FrozenTableOperations
+[       OK ] MemTableTest.FrozenTableOperations (0 ms)
+[ RUN      ] MemTableTest.LargeScaleOperations
+[       OK ] MemTableTest.LargeScaleOperations (0 ms)
+[ RUN      ] MemTableTest.MemorySizeTracking
+[       OK ] MemTableTest.MemorySizeTracking (0 ms)
+[ RUN      ] MemTableTest.MultipleFrozenTables
+[       OK ] MemTableTest.MultipleFrozenTables (0 ms)
+[ RUN      ] MemTableTest.ConcurrentOperations
+^C
+</code></pre>
+<p><code>ConcurrentOperations</code>需要你实现后续的迭代器功能。</p>
+<p>接下来你可以开启下一小节的<a href="./lab2.2-iterator.html">Lab</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lab2/lab2-memtable.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../lab2/lab2.2-iterator.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lab2/lab2-memtable.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../lab2/lab2.2-iterator.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

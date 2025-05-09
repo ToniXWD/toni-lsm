@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html lang="ch" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Lab 3 SST - toni-lsm-lab</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">toni-lsm-lab</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="1-概述"><a class="header" href="#1-概述">1 概述</a></h1>
+<p>这一章的开头我们再次搬出我们的经典架构图:</p>
+<p><img src="../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
+<p>通过<a href="../lab1/lab1-skiplist.html">Lab1</a>和<a href="../lab2/lab2-memtable.html">Lab2</a>的学习，我们已经初步完成了<code>LSM Tree</code>中内存的基础读写组件, 这一章我们将眼光从内存迁移到磁盘, 实现<code>SST</code>相关的内容。</p>
+<p>从架构图中我们知道，<code>SST</code>文件是<code>LSM Tree</code>中持久化的存储文件，其中<code>Level 0</code>的<code>SST</code>存储了<code>MemTable</code>中单个<code>Skiplist</code>的数据，并且提供了<code>LSM Tree</code>中数据的有序性。因此对于一个磁盘中的文件, 我们肯定需要实现文件的编解码设计。其中编码设计用于将内存的<code>Skiplist</code>类的实例转化为<code>SST</code>文件, 而读取<code>SST</code>中的某些键值对时我们需要将文件进行解码并读取数据到内存。因此这一章中编解码是一大主题内容。而且相对之前常驻内存的<code>MemTable</code>而言, 这里的编解码代码的实现更为复杂, 尤其是<code>Debug</code>难度比之前要大上不少。</p>
+<p>此外，我们从架构图中还了解到，不同<code>Level</code>的<code>SST</code>是需要再容量超出阈值时进行合并(<code>Compact</code>)的, 但<code>Compact</code>在本实验中是由更上层的控制结构实现的, 因此本节实验你不需要担心<code>Compact</code>, 这是后续<code>Lab</code>的内容, 这里提一嘴只是为了有助于从理论上理解其运行机制。</p>
+<h1 id="2-sst-的结构"><a class="header" href="#2-sst-的结构">2 SST 的结构</a></h1>
+<p>从架构图中我们了解到，不同<code>Level</code>之间的容量呈指数增长, 其中最小的<code>Level 0</code>的<code>SST</code>也是<code>SkipList</code>的大小, 而<code>SkipList</code>实例在内存中是由多个链表组成的, 查询速度基本上和红黑树差不多。但假若我们想从<code>SST</code>中查一个键值对，总不可能把整个<code>SST</code>都解码放到内存中吧? 要知道高层<code>Level</code>的<code>SST</code>是可以轻易增长到<code>GB</code>的大小的。因此，<code>SST</code>必须进行内部的切分, 这里切分形成的一块数据我们称之为<code>Block</code>。因此对<code>Block</code>的组织管理就是<code>SST</code>设计的核心内容。<code>Toni-LSM</code>的<code>SST</code>文件结构如下:</p>
+<p><img src="../images/lab3/SST.drawio.png" alt="SST-Arch" /></p>
+<p><code>SST</code>文件由多个<code>Block</code>组成，每个<code>Block_x</code>内部暂且看成一个黑箱, 只需要知道其是我们查询的基本IO单元即可。 每个<code>Block_x</code>后会追加32位的哈希值，用于校验。每个<code>Block</code>对应一个<code>Meta</code>, 每个<code>Meta</code>记录这个<code>Block</code>在<code>SST</code>文件中的偏移量、第一个和最后一个<code>key</code>的元数据(长度和大小)。</p>
+<p>这里，<code>Block</code>是基本的IO单元，这就意味着在查询一个<code>key</code>时, 其所在的整个<code>Block</code>的数据都会被解码并加载到内存中的。你可以类比操作系统中的<code>Page</code>, 其是内存和磁盘之间的基本IO单元。</p>
+<p>另一方面，在查询一个<code>key</code>时，如何确定查哪一个<code>Block</code>呢? 这里就需要将<code>SST</code>中的<code>Extra Information</code>中的元数据提前加载到内存中, 这些元数据能够定位到<code>Meta Section</code>, 而<code>Meta Section</code>是一个数组, 其中每个<code>Meta_x</code>记录了对应<code>Block</code>在整个<code>SST</code>中的位置， 可以以此来快速对指定为位置的二进制数据进行解码。</p>
+<blockquote>
+<p>你肯定能想到, 作为基本的IO单元, 我们肯定会为其实现一个缓存池的, 这样可以避免每次查询时都进行磁盘IO。</p>
+</blockquote>
+<p>心细的你肯定也注意到, 这里有一个<code>Bloom Section</code>, 这其实就是布隆过滤器中的<code>bit</code>位数组, 其用处是拦截无效的访问, 这会在后续的<code>Lab</code>中进行详细讲解。</p>
+<h1 id="3-block的结构"><a class="header" href="#3-block的结构">3 Block的结构</a></h1>
+<p>现在我们来看<code>Block</code>的结构, <code>Block</code>是<code>SST</code>中的基本IO单元，即<code>SST</code>的每个查询最终是在<code>Blcok</code>中定位到具体的键值对的, 其结构为:</p>
+<p><img src="../images/lab3/Block.png" alt="Block" /></p>
+<blockquote>
+<p>上图的<code>B</code>表示一个字节</p>
+</blockquote>
+<p>一个<code>Block</code>包含:<code>Data Section</code>、<code>Offset Section</code>和<code>Extra Information</code>三部分:</p>
+<ul>
+<li><code>Data Section</code>: 存放所有的数据, 也就是<code>key</code>和<code>value</code>的序列化数据
+<ul>
+<li>每一对<code>key</code>和<code>value</code>都是一个<code>Entry</code>， 编码信息包括<code>key_len</code>、<code>key</code>、<code>value_len</code>和<code>value</code>
+<ul>
+<li><code>key_len</code>和<code>value_len</code>都是<code>2B</code>的<code>uint16_t</code>类型, 用于表示<code>key</code>和<code>value</code>的长度</li>
+<li><code>key</code>和<code>value</code>就是对应长度的字节数, 因此需要用<code>varlen</code>来表示。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>Offset Section</code>: 存放所有<code>Entry</code>的偏移量, 用于快速定位</li>
+<li><code>Extra Information</code>: 存放<code>num_of_elements</code>, 也就是<code>Entry</code>的数量</li>
+</ul>
+<p>这样编码满足了最基本的要求, 从最后的2个字节可以知道<code>Block</code>包含了多少<code>kv</code>对, 再从<code>Offset Section</code>中查询对应的<code>kv</code>对数据的偏移。</p>
+<h1 id="4-思考"><a class="header" href="#4-思考">4 思考</a></h1>
+<p>现在有了<code>Block</code>和<code>SST</code>的设计方案, 你可以思考如下几个问题:</p>
+<ol>
+<li><code>Blcok</code>和<code>SST</code>是如何构建的? <code>Block</code>如何进行划分?</li>
+<li><code>Block</code>内部如何实现迭代器吗?</li>
+<li><code>SST</code>的迭代器是单独设计, 还是对已有<code>Blcok</code>迭代器的封装? 如何封装?</li>
+<li><code>Block</code>的缓存池如何设计?</li>
+<li>布隆过滤器和缓存池的设计各自有什么作用? 他们的功能是否重复?</li>
+</ol>
+<p>当你对上述问题有过简单思考后, 你可以开启本次<code>Lab</code>了, 你需要有一定心理准备, 这一大章节的<code>Lab</code>原比之前的<code>MemTable</code>和<code>Skiplist</code>复杂, 现在开始第一部分 <a href="./lab3.1-Block.html">Block 实现</a>。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lab2/lab2.3-range-query.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../lab3/Block.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lab2/lab2.3-range-query.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../lab3/Block.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

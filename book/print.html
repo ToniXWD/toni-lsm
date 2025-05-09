@@ -1,0 +1,1894 @@
+<!DOCTYPE HTML>
+<html lang="ch" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>toni-lsm-lab</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">toni-lsm-lab</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="toni-lsm-lab"><a class="header" href="#toni-lsm-lab">Toni-LSM Lab</a></h1>
+<p><img src="./logo/logo1-compact.jpg" alt="logo" /></p>
+<hr />
+<h1 id="0-toni-lsm是什么"><a class="header" href="#0-toni-lsm是什么">0 Toni-LSM是什么?</a></h1>
+<p><a href="https://github.com/ToniXWD/toni-lsm">Toni-LSM</a>是一个基于<code>LSM Tree</code>的开源教学<code>KV</code>存储引擎, 除<code>LSM Tree</code>的基础功能外, 还支持<code>MVCC</code>、<code>WAL</code>、崩溃恢复、<code>Redis</code>兼容等功能。本实验是基于作者原本实验的代码进行改造后的<code>Lab</code>课程。</p>
+<p><code>LSM Tree</code>（<code>Log-Structured Merge-Tree</code>）是一种适用于磁盘存储的数据结构，特别适合于需要高吞吐量的写操作的场景。它由Patrick O'Neil等人于1996年提出，广泛应用于NoSQL数据库和文件系统中，如<code>LevelDB</code>、<code>RocksDB</code>和<code>Cassandra</code>等。<code>LSM Tree</code>的主要思想是将数据写入操作日志（Log），然后定期将日志中的数据合并到磁盘上的有序不可变文件（SSTable）中。这些SSTable文件按层次结构组织，数据在多个层次之间逐步合并和压缩，以减少读取时的查找次数和磁盘I/O操作。</p>
+<p>有关<code>LSM Tree</code>的进一步背景和介绍请参见<a href="lab0-background.html">LSM Tree 概览</a></p>
+<p>本实现项目<code>Toni-LSN</code>完成了包括<code>内存表（MemTable）</code>、<code>不可变表（SSTable）</code>、<code>布隆过滤器（Bloom Filter）</code>、<code>合并和压缩（Compaction）</code>等<code>LSM Tree</code>的核心组件，并在此基础上添加了额外的功能博客, 包括:</p>
+<ul>
+<li>实现了<code>ACID</code>事务</li>
+<li>实现了<code>MVCC</code>多版本并发控制</li>
+<li>实现了<code>WAL</code>日志和崩溃恢复</li>
+<li>基于<code>KV</code>存储实现了<code>Redis</code>的<code>Resp</code>协议兼容层</li>
+<li>基于<code>Resp</code>协议兼容层实现了<code>redis-server</code>服务</li>
+</ul>
+<h3 id="-请支持我们的项目"><a class="header" href="#-请支持我们的项目">⭐ 请支持我们的项目！</a></h3>
+<blockquote>
+<p>如果您觉得本<code>Lab</code>不错, 请为<a href="https://github.com/ToniXWD/toni-lsm">Toni-LSM</a>点一个⭐。项目实验制作耗费了我很大精力，作者非常需要您的鼓励❤️, 您的支持是我更新的动力😆</p>
+</blockquote>
+<h1 id="1-本实验的目的是什么"><a class="header" href="#1-本实验的目的是什么">1 本实验的目的是什么?</a></h1>
+<p>本实验的最终目标是实现一个基于<code>LSM Tree</code>的单机<code>KV Store</code>引擎。其功能包括:</p>
+<ol>
+<li>基本的<code>KV</code>存储功能，包括<code>put</code>、<code>get</code>、<code>remove</code>等。</li>
+<li>持久化功能，构建的存储引擎的数据将持久化到磁盘中。</li>
+<li>事务功能，构建的存储引擎将支持<code>ACID</code>等基本事务特性</li>
+<li><code>MVCC</code>, 构建的存储引擎将支持<code>MVCC</code>对数据进行查询。</li>
+<li><code>WAL</code>与崩溃恢复, 数据写入前会先预写到<code>WAL</code>日志以支持崩溃恢复</li>
+<li><code>Redis</code>兼容, 本实验将实现<code>Redis</code>的<code>Resp</code>兼容层, 作为<code>Redis</code>后端。</li>
+</ol>
+<h1 id="2-本实验适合哪些人"><a class="header" href="#2-本实验适合哪些人">2 本实验适合哪些人？</a></h1>
+<p>通过本实验，你可以学习到<code>LSM Tree</code>这一工业界广泛使用的<code>KV</code>存储架构, 适合数据库、存储领域的入门学习者。同时本实验包含了<code>Redis</code>的<code>Resp</code>协议兼容层、网络服务器搭建等内容，也适合后端开发的求职者。同时，本项目使用<code>C++ 17</code>特性, 使用<code>Xmake</code>作为构建工具，并具备完善的单元测试，也适合想通过项目进一步学习现代<code>C++</code>的同学。</p>
+<h1 id="3-本实验的前置知识"><a class="header" href="#3-本实验的前置知识">3 本实验的前置知识？</a></h1>
+<p>本项目的知识包括：</p>
+<ol>
+<li><strong>(必备)</strong>: 到<code>C++17</code>为止的常见<code>C++</code>新特性，（项目的配置文件指定的标准为<code>C++20</code>, 但其只在单元测试中使用, 项目核心代码只要求<code>C++17</code>即可）</li>
+<li><strong>(必备)</strong>：常见的数据结构与算法知识</li>
+<li><strong>(建议)</strong>: 数据库的基本知识，包括事务特性、<code>MVCC</code>的基本概念</li>
+<li><strong>(建议)</strong>: <code>Linux</code>系统编程知识，本实验使用了系统底层的<code>mmap</code>等IO相关的系统调用</li>
+<li><strong>(可选)</strong>：<code>Xmake</code>的使用, 本实验的构建工具为<a href="https://xmake.io/#/zh-cn/"><code>Xmake</code></a>, 若你想自定义单元测试或引入别的库, 需要手动在<code>Xmake</code>中配置。</li>
+<li><strong>(可选)</strong>: <code>Redis</code>基本知识, 本实验将利用<code>kv</code>存储接口实现<code>Redis</code>后端, 熟悉<code>Redis</code>有助于实验的理解。</li>
+<li><strong>(可选)</strong>: 单元测试框架<code>gtest</code>的使用, 如果你想自定义单元测试, 需要自行改配置。</li>
+</ol>
+<h1 id="4-实验流程"><a class="header" href="#4-实验流程">4 实验流程</a></h1>
+<p>本实验的组织类似<a href="https://github.com/cmu-db/bustub"><code>CMU15445 bustub</code></a>, <code>Lab</code>提供了整体的代码框架, 并将其中某些组件的关键函数挖空并标记为<code>TODO</code>, 参与<code>Lab</code>的同学需要按照每一个<code>Lab</code>的指南补全缺失的函数, 并通过对应的单元测试。</p>
+<p>同样类似<code>CMU 15445</code>, 后面的<code>Lab</code>依赖于前一个<code>Lab</code>的正确性, 而实验提供的单元测试知识尽量考虑到了各种边界情况, 但不能完全确保你的代码正确, 因此必要时, 你需要自行进行单元测试补充以及<code>debug</code>。</p>
+<blockquote>
+<p>在目前的<code>Lab</code>中, 你确实可以从原仓库<a href="https://github.com/ToniXWD/toni-lsm">Toni-LSM</a>的<code>complete</code>分支直接查看<code>Lab</code>实验的答案, 但作者不希望你如此做, 这样你将无法深刻理解实验设计的思路和相关知识。</p>
+</blockquote>
+<p>在了解完这些以后, 你可以开启下一章<a href="./lab0-env.html">Lab 0 环境准备</a>的学习。</p>
+<h1 id="5-项目交流与讨论"><a class="header" href="#5-项目交流与讨论">5 项目交流与讨论</a></h1>
+<p>如果你对本<code>Lab</code>有疑问, 欢迎在<a href="https://github.com/ToniXWD/toni-lsm/issues">GitHub Issues</a>中提出问题。也欢迎加入次实验的<a href="https://qm.qq.com/q/wDZQfaNNw6">QQ讨论群</a> 。如果你想参与<code>Lab</code>的开发, 欢迎通过QQ群或者作者邮件: xwdtoni@126.com 联系。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-lsm-tree-简介"><a class="header" href="#1-lsm-tree-简介">1. LSM Tree 简介</a></h1>
+<p>在具体进入本实验之前，我们先来简单介绍<code>LSM Tree</code>。</p>
+<p><code>LSM Tree</code>是一种<code>KV</code>存储架构。其核心思想是，将<code>KV</code>存储的数据以<code>SSTable</code>的形式进行持久化，并通过<code>MemTable</code>进行内存缓存，当<code>MemTable</code>的数据量达到一定阈值时，将其持久化到磁盘中，并重新创建一个<code>MemTable</code>。<code>LSM Tree</code>的核心思想是，将<code>KV</code>存储的数据以<code>SSTable</code>的形式进行持久化，并通过<code>MemTable</code>进行内存缓存。并且， 数据以追加写入的方式进行，删除数据也是通过更新的数据进行覆盖的方式实现。</p>
+<p><img src="images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
+<p>如图所示为<code>LSM Tree</code>的核心架构。我们通过<code>Put</code>, <code>Remove</code>和<code>Get</code>操作的流程对其进行介绍。</p>
+<h2 id="11-put-操作流程"><a class="header" href="#11-put-操作流程">1.1 Put 操作流程</a></h2>
+<p><code>Put</code>操作流程如下：</p>
+<ol>
+<li>将<code>Put</code>操作的数据写入<code>MemTable</code>中
+<ol>
+<li><code>MemTable</code>中包括多个键值存储容器(本项目是采用的跳表<code>SkipList</code>)
+<ol>
+<li>其中有一份称为<code>current_table</code>, 即活跃跳表, 其可读可写</li>
+<li>其余的多份跳表均为<code>frozen_tables</code>, 即即冻结跳表, 其只能进行读操作</li>
+</ol>
+</li>
+<li><code>Put</code>的键值对首先插入到<code>current_table</code>中
+<ol>
+<li>如果<code>current_table</code>的数据量未达到阈值, 直接返回给客户端</li>
+<li>如果<code>current_table</code>的数据量达到阈值, 则将<code>current_table</code>被冻结称为<code>frozen_tables</code>中的一份, 并重新初始化一份<code>current_table</code></li>
+</ol>
+</li>
+</ol>
+</li>
+<li>如果前述步骤导致了新的<code>frozen_table</code>产生, 判断<code>frozen_table</code>的容量是否超出阈值</li>
+<li>如果超出阈值, 则将<code>frozen_table</code>持久化到磁盘中, 形成<code>SST</code>(全程是<code>Sorted String Table</code>), 单个<code>SST</code>是有序的。
+<ol>
+<li><code>SST</code>按照不同的层级进行划分, 内存中的<code>MemTable</code>刷出的<code>SST</code>位于<code>Level 0</code>, <code>Level 0</code>的<code>SST</code>是存在重叠的。（例如<code>SST 0</code>的<code>key</code>范围是<code>[0, 100)</code>, <code>SST 1</code>的<code>key</code>范围是<code>[50, 150)</code>, 那么<code>SST 0</code>和<code>SST 1</code>的<code>key</code>在<code>50, 100)</code>范围是重叠的, 因此无法在整个层级进行二分查询）</li>
+<li>当<code>Level 0</code>的<code>SST</code>数量达到一定阈值时, 会进行<code>Level 0</code>的<code>SST</code>合并, 将<code>SST</code>进行<code>compact</code>操作, 新的<code>SST</code>将放在<code>Level 1</code>中。同时，为保证此层所有<code>SST</code>的<code>key</code>有序且不重叠, <code>compact</code>的<code>SST</code>需要与原来<code>Level 1</code>的<code>SST</code>进行重新排序。由于<code>compact</code>时将上一层所有的<code>SST</code>合并到了下一层, 因此每层单个<code>SST</code>的容量是呈指数增长的。</li>
+<li>当每一层的<code>SST</code>数量达到一定阈值时, <code>compact</code>操作会递归地向下一层进行。</li>
+</ol>
+</li>
+</ol>
+<h2 id="12-remove-操作流程"><a class="header" href="#12-remove-操作流程">1.2 Remove 操作流程</a></h2>
+<p>由于<code>LSM Tree</code>的操作是追加写入的, 因此<code>Remove</code>操作与<code>Put</code>操作本质上没有区别, 只是<code>Remove</code>的<code>value</code>被设定为空以标识数据的删除。</p>
+<h2 id="13-get-操作流程"><a class="header" href="#13-get-操作流程">1.3 Get 操作流程</a></h2>
+<p><code>Get</code>操作流程如下:</p>
+<ol>
+<li>先在<code>Memtable</code>中查找, 如果找到则直接返回。
+<ol>
+<li>优先查找活跃跳表<code>current_table</code></li>
+<li>其次尝试查找<code>frozen_tables</code>, 按照<code>id</code>倒序查找(因为<code>id</code>越小, 表示<code>SkipList</code>越旧)</li>
+</ol>
+</li>
+<li>如果在<code>Memtable</code>中未找到, 则在<code>SST</code>中查找。
+<ol>
+<li>先在<code>Level 0</code>层查找, 如果找到则直接返回。注意的是, <code>Level 0</code>层不懂的<code>SST</code>没有进行排序, 因此需要按照<code>SST</code>的<code>id</code>倒序逐个查找(因为<code>id</code>越小, 表示<code>SST</code>越旧, 优先级越低)</li>
+<li>随后逐个在后面的<code>Level</code>层查找, 此时所有的<code>SST</code>都已经进行过排序, 因此可在<code>Level</code>层面进行二分查询。</li>
+</ol>
+</li>
+<li>如果<code>SST</code>中为查询到, 返回。</li>
+</ol>
+<p>至此，你对<code>LSM Tree</code>的<code>CRUD</code>操作流程有了一个初步的印象, 如果你现在看不懂的话, 没关系。后续的<code>Lab</code>中会对每个模块有详细的讲解。</p>
+<h1 id="2-lsm-tree-vs-b-tree"><a class="header" href="#2-lsm-tree-vs-b-tree">2. LSM Tree VS B-Tree</a></h1>
+<p>接下来对比分析一下LSM Tree 和 B-Tree。B-Tree 和 LSM-Tree 是两种最常用的存储数据结构，广泛应用于各种数据库和存储引擎中。</p>
+<h2 id="21-b-tree-概述"><a class="header" href="#21-b-tree-概述">2.1 B-Tree 概述</a></h2>
+<h3 id="211-基本结构"><a class="header" href="#211-基本结构">2.1.1 基本结构</a></h3>
+<ul>
+<li><strong>多路搜索树</strong>：每个节点可包含多个键值对及对应子节点指针。</li>
+<li><strong>页（Page）存储</strong>：通常以固定大小页（如 4 KB）为单位，将数据保存在叶子节点或中间节点中。</li>
+</ul>
+<h3 id="212-读写流程"><a class="header" href="#212-读写流程">2.1.2 读写流程</a></h3>
+<ul>
+<li><strong>查找</strong>：从根节点开始，依次向下比较键值，直到叶子节点。</li>
+<li><strong>写入</strong>：在页内定位并修改；若页已满，则分裂节点并向上调整，保持树的平衡。</li>
+</ul>
+<h3 id="213-性能特点"><a class="header" href="#213-性能特点">2.1.3 性能特点</a></h3>
+<ul>
+<li><strong>查找</strong>：时间复杂度 O(log n)，适合读密集型应用。</li>
+<li><strong>写入</strong>：每次随机写与节点分裂会带来较高的 I/O 开销，不利于写密集型场景。</li>
+</ul>
+<hr />
+<h2 id="22-lsm-tree-概述"><a class="header" href="#22-lsm-tree-概述">2.2. LSM-Tree 概述</a></h2>
+<h3 id="221-设计动机"><a class="header" href="#221-设计动机">2.2.1 设计动机</a></h3>
+<p>为了解决传统 B-Tree 在写密集场景下的随机写和高写放大问题，LSM-Tree 采取“先内存写、再后台合并”的思路，以空间换时间，提升写入吞吐。</p>
+<h3 id="222-主要组件与流程"><a class="header" href="#222-主要组件与流程">2.2.2 主要组件与流程</a></h3>
+<ol>
+<li><strong>MemTable（内存表）</strong>：所有写操作首先追加到内存中的有序结构（如跳表）。</li>
+<li><strong>SSTable（磁盘表）</strong>：当 MemTable 达到阈值时，将其定期刷新为只读的磁盘文件。</li>
+<li><strong>后台 Compaction（合并）</strong>：将多个旧的 SSTable 合并、去重，并生成新的 SSTable，控制文件数量与数据冗余。</li>
+</ol>
+<h3 id="223-优化手段"><a class="header" href="#223-优化手段">2.2.3 优化手段</a></h3>
+<ul>
+<li><strong>Bloom Filter</strong>：快速判断某 key 是否存在于某个 SSTable，减少不必要的磁盘查找。</li>
+<li><strong>Index Block / Block Cache</strong>：缓存热点数据页，加速读请求。</li>
+<li><strong>Tiered / Leveled Compaction</strong>：通过分层或分阶段合并，平衡写放大与读放大。</li>
+</ul>
+<hr />
+<h2 id="23-b-tree-vs-lsm-tree-对比"><a class="header" href="#23-b-tree-vs-lsm-tree-对比">2.3. B-Tree vs. LSM-Tree 对比</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>特性</th><th>B-Tree</th><th>LSM-Tree</th></tr></thead><tbody>
+<tr><td>写入模式</td><td>随机写，页内更新，可能分裂节点</td><td>顺序写（追加），后台合并</td></tr>
+<tr><td>写放大</td><td>较低</td><td>较高（受合并策略影响）</td></tr>
+<tr><td>读取路径</td><td>单次树搜索</td><td>多级查找（MemTable + 多个 SSTable + 合并）</td></tr>
+<tr><td>读写性能场景</td><td>读密集型</td><td>写密集型</td></tr>
+<tr><td>磁盘友好性</td><td>随机 I/O</td><td>顺序 I/O，更适合 SSD</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p><strong>小结</strong>：LSM-Tree 在写入吞吐上优于 B-Tree，但读取延迟与 I/O 成本相对更高。
+更深入的对比分析可以阅读：
+<a href="https://tikv.org/deep-dive/key-value-engine/b-tree-vs-lsm/">https://tikv.org/deep-dive/key-value-engine/b-tree-vs-lsm/</a></p>
+</blockquote>
+<hr />
+<h2 id="24-常见系统及应用场景"><a class="header" href="#24-常见系统及应用场景">2.4 常见系统及应用场景</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>存储引擎 / 数据库</th><th>类型</th></tr></thead><tbody>
+<tr><td>LevelDB</td><td>嵌入式 KV 存储引擎</td></tr>
+<tr><td>RocksDB</td><td>KV 存储引擎</td></tr>
+<tr><td>HyperLevelDB</td><td>分布式 KV 存储</td></tr>
+<tr><td>PebbleDB</td><td>嵌入式 KV 存储</td></tr>
+<tr><td>Cassandra</td><td>分布式列存储数据库</td></tr>
+<tr><td>ClickHouse</td><td>分析型数据库</td></tr>
+<tr><td>InfluxDB</td><td>时间序列数据库</td></tr>
+</tbody></table>
+</div>
+<hr />
+<h2 id="25-lsm-tree-优化研究"><a class="header" href="#25-lsm-tree-优化研究">2.5 LSM-Tree 优化研究</a></h2>
+<p>LSM Tree自1997年提出后，有很多研究人员在LSM Tree的基础上进行了改进，部分代表性工作比如：</p>
+<p><a href="">RocksDB</a>, <a href="">LevelDB</a>：经典的LSM Based KV存储引擎.</p>
+<p><a href="https://www.usenix.org/system/files/conference/fast16/fast16-papers-lu.pdf">WiscKey: Separating Keys from Values in SSD-Conscious Storage</a>：分离 Key 和 Value，降低写放大</p>
+<p><a href="https://www.usenix.org/system/files/conference/fast16/fast16-papers-lu.pdf">Monkey: Optimal Bloom Filters and Tuning for LSM-Trees</a>：优化布隆过滤器分配策略，减少读放大</p>
+<p>这里不再进行详细介绍，感兴趣的可以阅读相关论文。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-os和编译器环境"><a class="header" href="#1-os和编译器环境">1 OS和编译器环境</a></h1>
+<p>本实验目前最高使用的<code>C++</code>标准是<code>C++20</code>, 所以需要使用<code>g++</code>或者<code>clang++</code>进行编译, 因此只要是支持<code>C++20</code>的编译器都可以. 我这里使用的操作系统是<code>kali linux</code>, 其和<code>Ubuntu</code>一样, 都是基于<code>Debian</code>, 且都使用<code>apt</code>作为系统包管理工具, 所以你使用<code>Ubuntu</code>或者<code>Debian</code>执行我之后的安装指令肯定也没有什么问题。</p>
+<blockquote>
+<p>我使用<code>WSL2</code>的<code>kali linux</code>作为开发环境, <code>WSL2</code>相关内容可以参考<a href="https://zhuanlan.zhihu.com/p/682583573">WSL入门到入土</a>
+经个人验证, <code>WSL2</code>的<code>kali-linux</code>和<code>Ubuntu 22.04</code>均能正常完成本实验</p>
+</blockquote>
+<h2 id="11-编译器安装"><a class="header" href="#11-编译器安装">1.1 编译器安装</a></h2>
+<pre><code class="language-bash">sudo apt install -y gcc
+sudo apt install -y g++
+</code></pre>
+<p>经测试, 只要支持<code>C++20</code>的编译器均可以正常构建本项目, 我测试通过的编译器版本包括:</p>
+<ul>
+<li><code>g++-11/12/13/14/15</code></li>
+<li><code>clang++-16/17/18/19</code></li>
+</ul>
+<h2 id="12-语言服务器"><a class="header" href="#12-语言服务器">1.2 语言服务器</a></h2>
+<p>本实验推荐使用<code>clangd</code>作为语言服务器, <code>clangd</code>是一个<code>C/C++</code>语言服务器, 其可以提供代码补全、代码跳转、代码高亮等功能。</p>
+<pre><code class="language-bash"># Ubuntu/Debian/Kali
+sudo apt update
+sudo apt install -y clangd
+
+# Arch Linux / Manjaro
+sudo pacman -S clang # 安装的是最新版本的 clang 包，clangd 自动包含在其中。
+
+# Fedora / CentOS / RHEL
+sudo dnf install clang-tools-extra # langd 在 clang-tools-extra 包中
+
+# openSUSE
+sudo zypper install clang-tools
+</code></pre>
+<h1 id="2-项目管理工具"><a class="header" href="#2-项目管理工具">2 项目管理工具</a></h1>
+<h2 id="21-xmake"><a class="header" href="#21-xmake">2.1 Xmake</a></h2>
+<h3 id="211-安装"><a class="header" href="#211-安装">2.1.1 安装</a></h3>
+<p>本实验使用<code>Xmake</code>作为项目管理工具, <code>Xmake</code>是一个<code>C/C++</code>项目管理工具, 其可以看做<code>Make</code>+<code>CMake</code>+<code>vcpkg</code>的集合, 包括构建、依赖管理和项目运行等功能。</p>
+<p><strong>安装Xmake</strong></p>
+<pre><code class="language-bash">curl -fsSL https://xmake.io/shget.text | bash
+</code></pre>
+<p><code>Xmake</code>官网参考: https://xmake.io/#/getting_started</p>
+<h3 id="212-xmake语法简介"><a class="header" href="#212-xmake语法简介">2.1.2 Xmake语法简介</a></h3>
+<p><code>Xmake</code>使用<code>Lua</code>作为脚本语言，其语法简单易学，支持<code>C/C++</code>的依赖管理、构建、运行等功能。以下是一些基本的内置函数：</p>
+<ul>
+<li><strong>项目配置</strong>：通过 <code>add_rules</code> 添加规则，如添加 C++11 支持。</li>
+<li><strong>目标定义</strong>：使用 <code>target</code> 定义构建目标，包括可执行文件或库。</li>
+<li><strong>源文件指定</strong>：通过 <code>set_sources</code> 指定源代码文件。</li>
+<li><strong>依赖管理</strong>：定义项目时使用<code>add_requires</code>添加依赖, 定义目标时用 <code>add_deps</code> 声明本地依赖的目标, 使用 <code>add_packages</code> 添加第三方包依赖。</li>
+<li><strong>宏定义与包含路径</strong>：分别通过 <code>add_defines</code> 和 <code>add_includedirs</code> 设置。</li>
+</ul>
+<p>这里说起来比较抽象, 直接看一个示例：</p>
+<pre><code class="language-lua">-- 定义项目
+set_project("toni-lsm")
+set_version("0.0.1")
+set_languages("c++20")
+
+add_rules("mode.debug", "mode.release")
+add_requires("gtest") -- 添加gtest依赖
+add_requires("muduo") -- 添加Muduo库
+
+target("utils")
+    set_kind("static")  -- 生成静态库
+    add_files("src/utils/*.cpp") -- 指定源代码文件
+    add_includedirs("include", {public = true})
+
+target("example")
+    set_kind("binary")  -- 生成可执行文件
+    add_files("example/main.cpp") -- 指定源代码文件
+    add_deps("utils") -- 声明依赖目标
+    add_includedirs("include", {public = true})
+    set_targetdir("$(buildir)/bin")
+    add_packages("gtest")  -- 添加gtest包
+</code></pre>
+<p>常用的</p>
+<p>以上是 <code>Xmake</code> 的基本语法概览，更多细节可以参考官方文档: https://xmake.io/#/getting_started</p>
+<h2 id="22-可选vcpkg安装"><a class="header" href="#22-可选vcpkg安装">2.2 (可选)vcpkg安装</a></h2>
+<p>正常情况下, <code>Xmake</code>已经足够本项目的构建需求。但是可能存在系统依赖不兼容导致<code>Xmake</code>无法从<code>xrepo</code>拉取依赖的情况, 此时建议使用<code>vcpkg</code>进行第三方的依赖管理。</p>
+<p><code>vcpkg</code>是一个跨平台依赖管理工具, 其可以自动下载、编译和安装<code>C/C++</code>依赖库。虽然<code>Xmake</code>自带一个依赖管理库, 但上面的库还是比较少, 作为补充, 我们可以再安装<code>vcpkg</code>, 这使得我们可以使用<code>vcpkg</code>来安装更多<code>Xmake</code>没有的依赖库。</p>
+<p><code>vcpkg</code>这里不过多介绍, 可以直接看我另一篇文章: https://zhuanlan.zhihu.com/p/849150169</p>
+<h1 id="3-vscode配置"><a class="header" href="#3-vscode配置">3 VSCode配置</a></h1>
+<h2 id="31-代码智能提示和跳转"><a class="header" href="#31-代码智能提示和跳转">3.1 代码智能提示和跳转</a></h2>
+<p>这里使用<code>clangd</code>作为语言服务器, 我们之前已经安装了<code>clangd</code>, 现在只需要在<code>VSCode</code>中安装<code>clangd</code>插件即可:</p>
+<p><img src="images/lab0/clangd-isntall.png" alt="clangd-isntall" /></p>
+<h2 id="32-集成xmake"><a class="header" href="#32-集成xmake">3.2 集成Xmake</a></h2>
+<p><code>VScode</code>中支持<code>Xmake</code>项目管理工具, 我们可以安装<code>Xmake</code>插件, 使得在<code>VSCode</code>中可以更方便的使用<code>Xmake</code>项目管理工具:</p>
+<p><img src="images/lab0/Xmake-VSC.png" alt="Xmake-VSC" /></p>
+<p>这里有一点需要说明, 如果你安装了<code>Xmake</code>插件, 但是在调试时卡死不懂, 建议禁用<code>Code Runner</code>和<code>C/C++ Runner</code>两个插件, 如果还行不将<code>CMake</code>插件也一起禁用了:</p>
+<img src="images/lab0/ban-extensions.png" width="400">
+<p>如果你的<code>Xmake</code>在调试时进入的是<code>gdb</code>的页面, 请在设置中将<code>Debug Config Type</code>设置为<code>lldb</code>:</p>
+<img src="images/lab0/xmake-lldb.png" width="800">
+<p>当然你需要先安装<code>CodeLLdb</code>插件:</p>
+<img src="images/lab0/CodeLLdb.png" width="400">
+<h2 id="33-代码高亮"><a class="header" href="#33-代码高亮">3.3 代码高亮</a></h2>
+<p>如果你经常用<code>C++</code>开发, 那么你可能经常会遇到第三方包导致代码高亮跳转失效的问题:</p>
+<img src="images/lab0/clangd-error.png" width="500">
+<p>这是因为语言服务器找不到第三方包的头文件, 由于我们使用的语言服务器是<code>clangd</code>, 我们可以在项目根目录中添加<code>.clangd</code>配置文件, 让<code>clangd</code>知道我们的第三方包头文件的位置:</p>
+<pre><code class="language-yaml">CompileFlags:            # 编译标志部分
+  Add:
+    - "-std=c++20"      # 添加 C++17 支持
+    - "-isystem/home/toni/proj/vcpkg/installed/x64-linux/include" # 包含头文件, 绝对路径
+    - "-isystem/home/toni/.xmake/packages/m/muduo/2022.11.01/e9382a25649e4e43bf04f01f925d9c2f/include" # 包含头文件, 绝对路径
+</code></pre>
+<p>这样一来之前的告警就不复存在了</p>
+<h2 id="34-其他实用插件"><a class="header" href="#34-其他实用插件">3.4 其他实用插件</a></h2>
+<h3 id="341-better-comments--todotree"><a class="header" href="#341-better-comments--todotree">3.4.1 Better Comments &amp;&amp; TodoTree</a></h3>
+<p><code>Better Comments</code>是一个<code>VSCode</code>插件, 它可以提供代码注释高亮和语法高亮功能, 使得代码更加易读。比如像<code>TODO</code>, <code>!</code>这样的符号:</p>
+<img src="images/lab0/Better-Comments.png" width="400">
+<p>当我们实现一个功能但其后续需要更新时, 我们可以在代码中添加<code>TODO</code>注释, 以便后续更新时更醒目。</p>
+<p><code>TodoTree</code>则会在侧边栏展开我们标记了<code>TODO</code>的注释的位置</p>
+<img src="images/lab0/TODO.png" width="400">
+<h3 id="342-ai插件"><a class="header" href="#342-ai插件">3.4.2 AI插件</a></h3>
+<p>如果你有钱, 直接用<code>Cusor</code>, <code>Windsurf</code>, 他们的体验更好</p>
+<p>如果和我一样不够钱, 那么你可以使用<code>通义灵码</code>, <code>Cline</code>或者<code>GitHub Copilot</code>:</p>
+<img src="images/lab0/lingma.png" width="400">
+<img src="images/lab0/Copilot.png" width="400">
+<img src="images/lab0/Cline.png" width="400">
+<h1 id="4-lab代码仓库说明"><a class="header" href="#4-lab代码仓库说明">4 Lab代码仓库说明</a></h1>
+<p>按照下面的命令拉取实验代码仓库:</p>
+<pre><code class="language-bash">git clone https://github.com/ToniXWD/toni-lsm.git --depth 1 -b lab
+</code></pre>
+<p>如果你之前的环境配置没有问题的话, 编译项目能够正常进行:</p>
+<pre><code class="language-bash">cd toni-lsm
+xmake
+</code></pre>
+<h3 id="项目目录结构"><a class="header" href="#项目目录结构">项目目录结构</a></h3>
+<pre><code class="language-bash">toni-lsm/
+├── doc/           # 项目文档
+├── example/       # 示例程序
+├── include/       # 公共头文件
+├── sdk/           # SDK 接口
+├── server/        # 服务器端实现
+├── src/           # 核心源代码
+├── test/          # 测试代码
+├── .clangd        # Clangd 配置文件
+├── .gitignore     # Git 忽略文件配置
+├── Readme.md      # 项目说明文档
+└── xmake.lua      # xmake 构建配置文件
+</code></pre>
+<p>其中src目录下包含以下子目录：</p>
+<pre><code class="language-bash">src/
+├── block/           # 数据块的编码与解码
+├── iterator/        # 统一的迭代器接口
+├── lsm/             # LSM 引擎的核心逻辑
+├── memtable/        # 内存表（MemTable）管理
+├── redis_wrapper/   # Redis 协议兼容层
+├── skiplist/        # 跳表实现
+├── sst/             # SSTable 的读写与管理
+├── utils/           # 工具函数与通用组件
+├── wal/             # Write Ahead Log管理
+```</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-1-跳表"><a class="header" href="#lab-1-跳表">Lab 1 跳表</a></h1>
+<h2 id="1-跳表在-lsm-tree-中的作用"><a class="header" href="#1-跳表在-lsm-tree-中的作用">1 跳表在 LSM Tree 中的作用</a></h2>
+<p>本<code>Lab</code>中, 你将实现内存的基础数据结构作为<code>MemTable</code>的容器, 这里使用基于红黑树的<code>std::map</code>也是可行的, 但<code>LSM Tree</code>的原始论文中使用的是跳表, 因此我们选择使用跳表作为<code>MemTable</code>的容器，并且正好实现以下这个数据结构 (造轮子是<code>C++</code>的快乐)。</p>
+<p>我们再次回顾下面的这张架构图:</p>
+<p><img src="lab1/../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
+<p>这里的<code>MemTable</code>用于存储内存中的键值对数据, 其存储的基础容器即为<code>Skiplist</code>。<code>SkipList</code>被划分为2组: <code>current_table</code>和<code>frozen_table</code>。<code>current_table</code>可读可写, 并是唯一写入的<code>SkipList</code>, <code>frozen_table</code>是只读状态, 用于存储已经写入的键值对数据。<code>current_table</code>容量超出阈值即转化为<code>frozen_table</code>中的一个。</p>
+<h2 id="2-跳表的原理"><a class="header" href="#2-跳表的原理">2 跳表的原理</a></h2>
+<p>这里简单介绍一下跳表是什么, 跳表就是过个链表, 每个链表的步长不同, 且链表节点是排序的, 查找或插入时, 先使用最大步长层级的链表, 然后定位大区间后, 转入下层低步长层级的链表继续查询, 是不是非常简单? :smile:</p>
+<p><img src="lab1/../images/lab1/skipList.png" alt="SkipList-Arc" /></p>
+<p>上图所示为跳表的简单示意图, 可以看出跳表由多层链表组成，每一层都是一个有序链表。最底层的链表包含所有元素，而上层的链表只包含部分元素，这些元素作为“索引”加速查找过程。</p>
+<h3 id="21-查找过程"><a class="header" href="#21-查找过程">2.1 查找过程</a></h3>
+<p>假设我们要查找值为6的节点：</p>
+<ol>
+<li><strong>从最高层开始</strong>：从最高层的头节点开始，沿着水平指针向右移动，直到遇到大于目标值的节点或到达该层的末尾。</li>
+<li><strong>向下移动</strong>：如果当前层没有找到目标值，则沿着垂直指针向下移动到下一层，重复上述步骤。</li>
+<li><strong>继续查找</strong>：在每一层中重复这个过程，直到在最底层找到目标值或确定目标值不存在。</li>
+</ol>
+<h3 id="22-插入过程"><a class="header" href="#22-插入过程">2.2 插入过程</a></h3>
+<p>假设我们要插入值为6的节点：</p>
+<ol>
+<li><strong>查找插入位置</strong>：首先按照查找过程找到值为6应该插入的位置。在这个例子中，值为6应该插入在4和7之间。</li>
+<li><strong>创建新节点</strong>：在最底层创建一个新节点，值为6，并将其插入到正确的位置。</li>
+<li><strong>随机决定层数</strong>：使用随机算法决定新节点的层数。例如，可以以50%的概率决定是否将新节点添加到上一层。</li>
+<li><strong>更新指针</strong>：在每一层中更新指针，确保新节点被正确地链接到链表中。</li>
+</ol>
+<h3 id="23-删除过程"><a class="header" href="#23-删除过程">2.3 删除过程</a></h3>
+<p>假设我们要删除值为6的节点：</p>
+<ol>
+<li><strong>查找要删除的节点</strong>：首先按照查找过程找到值为6的节点。</li>
+<li><strong>逐层删除</strong>：从最底层开始，逐层删除该节点，并更新相应的指针。</li>
+<li><strong>调整层数</strong>：如果某一层只剩下头节点和尾节点，则可以考虑删除这一层以优化空间。</li>
+</ol>
+<h2 id="3-还欠缺什么"><a class="header" href="#3-还欠缺什么">3 还欠缺什么?</a></h2>
+<p>在你了解到了上述<code>LSM</code>的基础知识后, 你可能觉得<code>SkipList</code>的实现不过如此, 很简单吧。但实际上也没有那么简单，首先你需要思考下面几个问题：</p>
+<ol>
+<li>不同<code>Level</code>的链表的步长如何确定?
+<ul>
+<li>最底层<code>Level 0</code>的链表步长肯定是1, 那么<code>Level 1</code>呢, <code>Level 2</code>呢?</li>
+</ul>
+</li>
+<li>什么时候我们需要创建新的<code>Level</code>的?
+<ul>
+<li>一开始的时候, <code>SkipList</code>的<code>Level</code>是多少?</li>
+<li>新创建的<code>Level</code>是逐层创建的吗? 还是说一次性提升好几层?</li>
+</ul>
+</li>
+<li>上面演示的<code>SkipList</code>仅仅是单向链表, 如果是双向链表, 有什么区别呢?</li>
+</ol>
+<p>带着疑问, 你可以开启下一章<a href="lab1/lab2-skiplist-put.html">跳表 put/remove 的实现</a>的<code>Lab</code>实验了</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-准备工作"><a class="header" href="#1-准备工作">1 准备工作</a></h1>
+<p>本<code>Lab</code>中, 你需要修改的代码文件为</p>
+<ul>
+<li><code>src/skiplist/skipList.cpp</code></li>
+<li><code>include/skiplist/skiplist.h</code> (optional)</li>
+</ul>
+<p>这里首先简单介绍本<code>Lab</code>已有的<code>SkipList</code>头文件定义:</p>
+<pre><code class="language-cpp">// include/skiplist/skiplist.h
+struct SkipListNode {
+  std::string key_;   // 节点存储的键
+  std::string value_; // 节点存储的值
+  uint64_t tranc_id_; // 事务 id, 目前可以忽略
+  std::vector&lt;std::shared_ptr&lt;SkipListNode&gt;&gt;
+      forward_; // 指向不同层级的下一个节点的指针数组
+  std::vector&lt;std::weak_ptr&lt;SkipListNode&gt;&gt;
+      backward_; // 指向不同层级的下一个节点的指针数组
+  // ...
+};
+</code></pre>
+<p>这里定义了跳表节点的基础数据, 包括<code>key</code>, <code>value</code>和目前可以忽略的事务<code>tranc_id_</code></p>
+<p>这里定义的跳表节点使用的是双向链表, <code>forward_</code>和<code>backward_</code>分别存储了各层链表节点的前向指针和后向指针, 其中为了避免循环引用, 这里结合使用了<code>weak_ptr</code>和<code>shared_ptr</code>, 详细熟悉现代<code>C++</code>的同学对此非常熟悉。</p>
+<blockquote>
+<p>这里补充说明一下<code>weak_ptr</code>, 它的作用是避免<code>shared_ptr</code>循环引用, 即一个节点的<code>shared_ptr</code>指针指向另一个节点, 另一个节点的<code>shared_ptr</code>指针指向前者, 这样就会造成两个节点的析构都无法进行, 因为在析构时互相持有对方的引用计数, 类似死锁。但<code>weak_ptr</code>不参与类似<code>shared_ptr</code>的引用计数, 保证了析构的正确进行。但也正因为如此，<code>weak_ptr</code>不保证指针的有效性, 需要想使用<code>.lock()</code>判断该指针是否有效。</p>
+</blockquote>
+<p>然后我们看<code>SkipList</code>的头文件定义：</p>
+<pre><code class="language-cpp">
+class SkipList {
+private:
+  std::shared_ptr&lt;SkipListNode&gt;
+      head;              // 跳表的头节点，不存储实际数据，用于遍历跳表
+  int max_level;         // 跳表的最大层级数，限制跳表的高度
+  int current_level;     // 跳表当前的实际层级数，动态变化
+  size_t size_bytes = 0; // 跳表当前占用的内存大小（字节数），用于跟踪内存使用
+  // std::shared_mutex rw_mutex; // ! 目前看起来这个锁是冗余的, 在上层控制即可,
+  // 后续考虑是否需要细粒度的锁
+
+  std::uniform_int_distribution&lt;&gt; dis_01;  // 随机层数的辅助生成器
+  std::uniform_int_distribution&lt;&gt; dis_level;
+  std::mt19937 gen;
+};
+</code></pre>
+<p>这里我们定义了最大的链表层数<code>max_level</code>, 你的实现不能有超过<code>max_level</code>的链表数量, <code>current_level</code>定义当前链表的层数(注意是层数, 不是索引), 最后介绍最重要的<code>head</code>, 其只是个哨兵节点, 并不实际存储键值对。</p>
+<p>后面三行的<code>gen</code>和<code>dis_01</code>和<code>dis_level</code>是随机数生成器，你可以使用它们来生成随机数。回想我们之前提到的问题, 你应该如何确定每一此插入节点时起最高的连接链表的<code>Level</code>呢? 这里你可以利用这些随机生成器来确定这些层数, 当然你也可以选择自己的方式来实现。</p>
+<h1 id="2-put-的实现"><a class="header" href="#2-put-的实现">2 put 的实现</a></h1>
+<p>你需要实现下面的<code>put</code>函数:</p>
+<pre><code class="language-cpp">// 插入或更新键值对
+void SkipList::put(const std::string &amp;key, const std::string &amp;value,
+                   uint64_t tranc_id) {
+  spdlog::trace("SkipList--put({}, {}, {})", key, value, tranc_id);
+
+  // TODO: Lab1.1  任务：实现插入或更新键值对
+  // ? Hint: 你需要保证不同`Level`的步长从底层到高层逐渐增加
+  // ? 你可能需要使用到`random_level`函数以确定层数, 其注释中为你通公路一种思路
+}
+</code></pre>
+<p>目前, 你可以先忽略<code>tranc_id</code>这个参数。</p>
+<p>此外，之前提到过，跳表的层数是动态增加的， 因此你实现下面的函数可能对你有帮助：</p>
+<pre><code class="language-cpp">int SkipList::random_level() {
+  // TODO: 实现随机生成level函数
+  // 通过"抛硬币"的方式随机生成层数：
+  // - 每次有50%的概率增加一层
+  // - 确保层数分布为：第1层100%，第2层50%，第3层25%，以此类推
+  // - 层数范围限制在[1, max_level]之间，避免浪费内存
+  return -1;
+}
+</code></pre>
+<p>这里给出一个提示, 生成的整型值的每一个二级制位只包含0或1, 可以表示为<code>bool</code>类型, 因此你可以利用它来判断这个节点的最高层数:</p>
+<ol>
+<li><code>Level 0</code>底层链表: 一定连接新节点</li>
+<li><code>Level 1</code>链表: 判断<code>random_level()</code>生成整型数的第1位是否为1, 有<code>50%</code>的概率连接新节点, 为0则跳出该判断链</li>
+<li><code>Level 2</code>链表: 判断<code>random_level()</code>生成整型数的第2位是否为1, 有<code>50% * 50% =25%</code>的概率连接新节点, 为0则跳出该判断链</li>
+<li>...</li>
+</ol>
+<blockquote>
+<p>当然, 上述只是一个建议的方案, 你可以选择别的实现方案, 并删除<code>random_level</code>函数
+另外, 别忘记了更新<code>size_bytes</code>这个统计信息, 如果你不知道这个统计信息的运作规则, 你可以查看单元测试<code>SkipListTest.MemorySizeTracking</code></p>
+</blockquote>
+<h1 id="3-remove-的实现"><a class="header" href="#3-remove-的实现">3 remove 的实现</a></h1>
+<p>虽然我们的<code>LSM Tree</code>是以仅追加写入的方式使用我们的<code>SkipList</code>, 但为了这个数据结构的完整性, 也是一次手搓底层跳表的体验, 你需要实现正儿八经的<code>remove</code>函数:</p>
+<pre><code class="language-cpp">// 删除键值对
+// ! 这里的 remove 是跳表本身真实的 remove,  lsm 应该使用 put 空值表示删除,
+// ! 这里只是为了实现完整的 SkipList 不会真正被上层调用
+void SkipList::remove(const std::string &amp;key) {
+  // TODO: Lab1.1 任务：实现删除键值对
+}
+</code></pre>
+<p><code>remove</code>函数的实现的第一步是查询到指定的节点位置, 因此你可以尝试先实现<code>get</code>函数。</p>
+<h1 id="4-get-实现"><a class="header" href="#4-get-实现">4 get 实现</a></h1>
+<p>接下来实现<code>get</code>函数:</p>
+<pre><code class="language-cpp">// 查找键值对
+SkipListIterator SkipList::get(const std::string &amp;key, uint64_t tranc_id) {
+  // spdlog::trace("SkipList--get({}) called", key);
+  // ? 你可以参照上面的注释完成日志输出以便于调试
+  // ? 日志为输出到你执行二进制所在目录下的log文件夹
+
+  // TODO: Lab1.1 任务：实现查找键值对,
+  // TODO: 并且你后续需要额外实现SkipListIterator中的TODO部分(Lab1.2)
+  return SkipListIterator{};
+}
+</code></pre>
+<p>可以看到, 我们的<code>get</code>返回的是一个<code>SkipListIterator</code>, 它是一个迭代器, 可以用来遍历<code>SkipList</code>中的元素。这一部分涉及<code>SkipList Iterator</code>的实现不会在文档中进行展开, 你需要阅读源码, 这也是一项基本能力(这部分代码很简单, 别怕:smile:)</p>
+<blockquote>
+<p>这里的迭代器调用构造函数就可以了, 目前的<code>SkipListIterator</code>实现了一部分, 关于自增等运算符重载, 你将在后续的任务中实现。</p>
+</blockquote>
+<h1 id="4-测试"><a class="header" href="#4-测试">4 测试</a></h1>
+<p>当你完成上述操作后, <code>test/test_skiplist.cpp</code>中的部分单元测试你应该能够通过:</p>
+<pre><code class="language-bash">✗ cd toni-lsm
+✗ xmake
+✗ xmake run test_skiplist
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from SkipListTest
+[ RUN      ] SkipListTest.BasicOperations
+[       OK ] SkipListTest.BasicOperations (0 ms)
+[ RUN      ] SkipListTest.LargeScaleInsertAndGet
+[       OK ] SkipListTest.LargeScaleInsertAndGet (6 ms)
+[ RUN      ] SkipListTest.LargeScaleRemove
+[       OK ] SkipListTest.LargeScaleRemove (6 ms)
+[ RUN      ] SkipListTest.DuplicateInsert
+[       OK ] SkipListTest.DuplicateInsert (0 ms)
+[ RUN      ] SkipListTest.EmptySkipList
+[       OK ] SkipListTest.EmptySkipList (0 ms)
+[ RUN      ] SkipListTest.RandomInsertAndRemove
+[       OK ] SkipListTest.RandomInsertAndRemove (5 ms)
+[ RUN      ] SkipListTest.MemorySizeTracking
+[       OK ] SkipListTest.MemorySizeTracking (0 ms)
+[ RUN      ] SkipListTest.Iterator
+^C
+</code></pre>
+<p>到<code>SkipListTest.Iterator</code>前的单元测试你应该都能够通过, 卡在<code>SkipListTest.Iterator</code>是因为我们很没有实现迭代器相关功能。</p>
+<p>恭喜你, 你已经完成了<code>SkipList</code>的基础<code>CRUD</code>实现。接下来你可以进行<a href="lab1/./lab1.2-Iterator-query.html">Lab1.2</a>了。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-概述"><a class="header" href="#1-概述">1 概述</a></h1>
+<p>这一部分的内容很简单, 只需要补全跳表迭代器即可。跳表的迭代器基本上就是对<code>SkiplistNode</code>的最简化封装, 这一小节的代码量非常少, 也很简单, 不过重点是迭代器的设计和基类的继承关系。</p>
+<p>我们先来看它继承了什么基类：</p>
+<pre><code class="language-cpp">class SkipListIterator : public BaseIterator
+</code></pre>
+<p>这里的<code>BaseIterator</code>是所有组件的基类, 它的声明在<code>include/iterator/iterator.h</code>中。它是后续我们不同组件之间交互的桥梁。建议同学们认真读一下相关代码，很简单但很重要。</p>
+<h1 id="2-迭代器补全"><a class="header" href="#2-迭代器补全">2 迭代器补全</a></h1>
+<p>你需要补全<code>src/skiplist/skipList.cpp</code>中标记为<code>// TODO: Lab1.2</code>的迭代器函数：</p>
+<pre><code class="language-cpp">
+BaseIterator &amp;SkipListIterator::operator++() {
+  // TODO: Lab1.2 任务：实现SkipListIterator的++操作符
+  return *this;
+}
+
+bool SkipListIterator::operator==(const BaseIterator &amp;other) const {
+  // TODO: Lab1.2 任务：实现SkipListIterator的==操作符
+  return true;
+}
+
+bool SkipListIterator::operator!=(const BaseIterator &amp;other) const {
+  // TODO: Lab1.2 任务：实现SkipListIterator的!=操作符
+  return true;
+}
+
+SkipListIterator::value_type SkipListIterator::operator*() const {
+  // TODO: Lab1.2 任务：实现SkipListIterator的*操作符
+  return {"", ""};
+}
+
+IteratorType SkipListIterator::get_type() const {
+  // TODO: Lab1.2 任务：实现SkipListIterator的get_type
+  // ? 主要是为了熟悉基类的定义和继承关系
+  return IteratorType::Undefined;
+}
+</code></pre>
+<h1 id="3-测试"><a class="header" href="#3-测试">3 测试</a></h1>
+<p>现在你应该能通过<code>test/test_skiplist.cpp</code>中的<code>SkipListTest.Iterator</code>单元测试了</p>
+<p>没问题我们开始<code>Lab 1</code>的最后一部分: <a href="lab1/./lab1.3-range-query.html">Lab 1.3 范围查询</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-范围查询的特性"><a class="header" href="#1-范围查询的特性">1 范围查询的特性</a></h1>
+<p>根据之前的介绍我们了解到, 我们实现的跳表是一个有序数据结构, 而我们构建的数据库是<code>K00V00</code>数据库, 因此除了最基础的<code>CRUD</code>操作外, 我们还需要实现一个范围查询的功能。这些范围查询包括:</p>
+<ol>
+<li>前缀查询: 通过前缀查询, 我们可以查询以某个前缀开头的所有键值对。比如, 我们数据库中如果<code>k00ey</code>用<code>userxxx</code>标识用户数据, 可以查询以<code>"userxx"</code>开头的所有用户数据的键值对。</li>
+<li>范围查询: 通过范围查询, 我们可以查询某个范围内的键值对。比如, 我们数据库中如果<code>k00ey</code>是学生的学号, 那么我们可以查询某个学号范围内的学生数据<code>[100, 200)</code>。</li>
+</ol>
+<p>以上的查询都存在一个特性: 他们是单调的查询, 也就是说在全局数据库中只会出现一个这样的区间。</p>
+<p>例如我们有下面的键值对:</p>
+<pre><code class="language-text">(k001, v001), (k002, v002), (k003, v003), (k004, v004), (k005, v005), (k006, v006), (k007, v007), (k008, v008), (k009, v009), (k010, v010)
+</code></pre>
+<ul>
+<li>我们查询<code>key &gt;= k005 &amp;&amp; key &lt; k008</code>的范围, 我们可以得到:</li>
+</ul>
+<pre><code class="language-text">(k005, v005), (k006, v006), (k007, v007)`。
+</code></pre>
+<ul>
+<li>我们查询<code>key前缀为k00</code>的键值对, 我们可以得到:</li>
+</ul>
+<pre><code class="language-text">`(k001, v001), (k002, v002), (k003, v003), (k004, v004), (k005, v005), (k006, v006), (k007, v007), (k008, v008), (k009, v009)`。
+</code></pre>
+<p>可以看到, 这些查询都是单调的, 也就是说, 全局数据库中只会出现一个这样的区间。而考虑到我们的数据库是有序的, 因此可以使用二分查询的方式, 确定查询区间的开始位置和结束位置, 以迭代器的形式返回查询结果即可。</p>
+<h1 id="2-实现"><a class="header" href="#2-实现">2 实现</a></h1>
+<h2 id="21-前缀查询"><a class="header" href="#21-前缀查询">2.1 前缀查询</a></h2>
+<p>你需要实现这两个函数：</p>
+<pre><code class="language-cpp">// 找到前缀的起始位置
+// 返回第一个前缀匹配或者大于前缀的迭代器
+SkipListIterator SkipList::begin_preffix(const std::string &amp;preffix) {
+  // TODO: Lab1.3 任务：实现前缀查询的起始位置
+  return SkipListIterator{};
+}
+
+// 找到前缀的终结位置
+SkipListIterator SkipList::end_preffix(const std::string &amp;prefix) {
+  // TODO: Lab1.3 任务：实现前缀查询的终结位置
+  return SkipListIterator{};
+}
+</code></pre>
+<p>注意的是, 这里迭代器返回的定义类似<code>STL</code>中迭代器<code>end</code>, 其并不属于指定的区间类, 也就是说区间的数学表达是<code>[begin, end)</code></p>
+<h2 id="22-谓词查询"><a class="header" href="#22-谓词查询">2.2 谓词查询</a></h2>
+<p>这里除了前缀查询外, 还包括各种其他的查询, 只要他们是单调的即可。因此我们给出了一种更通用的接口, 谓词查询, 只需要上层调用者提供一个谓词(<code>lambda</code>函数或者仿函数均可), 我们就可以实现各种单调区间的范围查询。</p>
+<p>因此, 我们可以设计这样一个查询接口, 其接收一个谓词, 这个谓词的具体函数体说明此次查询是普通的范围查询、前缀匹配或者是其他的单条区间查询, 但要求结果一定在全局只位于一个连续区间中就可以。同时该谓词不能返回<code>bool</code>值, 而是类似字符串比较那样返回一个<code>int</code>值, 0 表示不匹配, 1 表示大于, -1 表示小于。这样我们才可以根据返回值确定下一步二分查找的方向。</p>
+<p>我们需要逐层次实现这个支持谓词的查询接口，其返回一组迭代器表示<code>start</code>和<code>end</code>, 这里我们还是要利用<code>SkipList</code>的有序性多层不同步长的链表来实现快速的匹配查询。</p>
+<p>你需要实现下面的函数:</p>
+<pre><code class="language-cpp">// ? 这里单调谓词的含义是, 整个数据库只会有一段连续区间满足此谓词
+// ? 例如之前特化的前缀查询，以及后续可能的范围查询，都可以转化为谓词查询
+// ? 返回第一个满足谓词的位置和最后一个满足谓词的迭代器
+// ? 如果不存在, 范围nullptr
+// ? 谓词作用于key, 且保证满足谓词的结果只在一段连续的区间内, 例如前缀匹配的谓词
+// ? predicate返回值:
+// ?   0: 满足谓词
+// ?   &gt;0: 不满足谓词, 需要向右移动
+// ?   &lt;0: 不满足谓词, 需要向左移动
+// ! Skiplist 中的谓词查询不会进行事务id的判断, 需要上层自己进行判断
+std::optional&lt;std::pair&lt;SkipListIterator, SkipListIterator&gt;&gt;
+SkipList::iters_monotony_predicate(
+    std::function&lt;int(const std::string &amp;)&gt; predicate) {
+  // TODO: Lab1.3 任务：实现谓词查询的起始位置
+  return std::nullopt;
+}
+</code></pre>
+<blockquote>
+<p>Hint: 这里的思路其实也很简单, 推荐的思路如下:</p>
+<ol>
+<li>先逐次使用高<code>Level</code>的链表, 逐次降低, 找到满足谓词的区间的某一个节点<code>node1</code></li>
+<li>根据找到的节点<code>node1</code>, 逐次向左移动, 直到找到第一个满足谓词的节点<code>node0</code></li>
+<li>根据找到的节点<code>node1</code>, 逐次向右移动, 直到找到最后一个满足谓词的节点<code>node2</code></li>
+<li>返回找到的节点<code>node0</code>和<code>node2</code></li>
+</ol>
+</blockquote>
+<blockquote>
+<p>看到这里你应该也明白了, 为什么实验的<code>Skiplist</code>的头文件定义采用了双向链表, 目的就是方便这里谓词查询链表节点方向移动的便捷性</p>
+</blockquote>
+<h1 id="3-测试-1"><a class="header" href="#3-测试-1">3 测试</a></h1>
+<p>完成上面的函数后, 你应该可以通过所有的<code>test/test_skiplist.cpp</code>的单元测试:</p>
+<pre><code class="language-cpp">✗ xmake
+[100%]: build ok, spent 5.785s
+✗ xmake run test_skiplist
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from SkipListTest
+[ RUN      ] SkipListTest.BasicOperations
+[       OK ] SkipListTest.BasicOperations (0 ms)
+[ RUN      ] SkipListTest.LargeScaleInsertAndGet
+[       OK ] SkipListTest.LargeScaleInsertAndGet (7 ms)
+[ RUN      ] SkipListTest.LargeScaleRemove
+[       OK ] SkipListTest.LargeScaleRemove (6 ms)
+[ RUN      ] SkipListTest.DuplicateInsert
+[       OK ] SkipListTest.DuplicateInsert (0 ms)
+[ RUN      ] SkipListTest.EmptySkipList
+[       OK ] SkipListTest.EmptySkipList (0 ms)
+[ RUN      ] SkipListTest.RandomInsertAndRemove
+[       OK ] SkipListTest.RandomInsertAndRemove (6 ms)
+[ RUN      ] SkipListTest.MemorySizeTracking
+[       OK ] SkipListTest.MemorySizeTracking (0 ms)
+[ RUN      ] SkipListTest.Iterator
+[       OK ] SkipListTest.Iterator (0 ms)
+[ RUN      ] SkipListTest.IteratorPreffix
+[       OK ] SkipListTest.IteratorPreffix (0 ms)
+[ RUN      ] SkipListTest.ItersPredicate_Base
+[       OK ] SkipListTest.ItersPredicate_Base (0 ms)
+[ RUN      ] SkipListTest.ItersPredicate_Large
+[       OK ] SkipListTest.ItersPredicate_Large (5 ms)
+[ RUN      ] SkipListTest.TransactionId
+[       OK ] SkipListTest.TransactionId (0 ms)
+[----------] 12 tests from SkipListTest (25 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (25 ms total)
+[  PASSED  ] 12 tests.
+</code></pre>
+<p>此外, 单元测试目前并没有规定你的实现的效率, 但你的实现在<code>release</code>模式下, 不应该超过<code>100ms</code>, (<code>30ms</code>以内最佳)</p>
+<p>到此为止, <code>Lab1</code>的实验结束, 恭喜你完成本实验!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-2-memtabele"><a class="header" href="#lab-2-memtabele">Lab 2 MemTabele</a></h1>
+<p>本<code>Lab</code>中, 你将基于之前实现的<code>Skiplist</code>, 将其组织成内存中负责存储键值对的组件<code>MemTable</code>。</p>
+<h2 id="1-memtable的构造原理"><a class="header" href="#1-memtable的构造原理">1 MemTable的构造原理</a></h2>
+<p>再次回顾我们的整体架构图：</p>
+<p><img src="lab2/../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
+<p><code>MemTable</code>负责存储内存中的键值对数据，其存储的基础容器即为<code>Skiplist</code>。<code>SkipList</code>被划分为2组：<code>current_table</code>和<code>frozen_table</code>。<code>current_table</code>可读可写，并是唯一写入的<code>SkipList</code>，<code>frozen_table</code>是只读状态，用于存储已经写入的键值对数据。<code>current_table</code>容量超出阈值即转化为<code>frozen_table</code>中的一个。</p>
+<p>为什么要如此设计呢? 答案是为了提升并发性, 我们的查询与写入的逻辑如下图所示:</p>
+<p><img src="lab2/../images/lab2/MemTable.drawio.png" alt="Fig 2" /></p>
+<p>我们在写入时始终只对活跃的<code>current_table</code>进行写入，而查询时则同时对<code>current_table</code>和<code>frozen_table</code>进行查询。这样, 如果我们不将内存表进行划分的话, 查询和写入将同时对一张大的<code>SkipList</code>进行操作, 这将导致并发度降低。反之, 我们将<code>MemTable</code>划分为<code>current_table</code>和<code>frozen_tables</code>后, 我们可以在写入<code>current_table</code>的同时对<code>frozen table</code>进行查询, 大幅度提升了并发量。</p>
+<h2 id="2-skiplist查询的优先级"><a class="header" href="#2-skiplist查询的优先级">2 <code>SkipList</code>查询的优先级</a></h2>
+<p>由之前的理论描述所知, 我们的<code>frozen_tables</code>包含多份<code>Skiplist</code>, 而<code>LSM Tree</code>的写入是追加写入, 后写入的数据会覆盖前面的数据。因此，查询时，我们应该按照从新到旧的顺序查询<code>frozen_tables</code>。如同架构图中<code>Get</code>的查询路径中<code>Path 1.1, Path 1.2, Path 1.3, Path 1.4</code>分别按照从新到旧的顺序查询<code>Skiplist</code>, 一旦查询成功即返回。</p>
+<h2 id="3-思考"><a class="header" href="#3-思考">3 思考</a></h2>
+<blockquote>
+<p>本实验的惯例是先介绍对应<code>Lab</code>的基本原理, 再抛出一些思考题，你可以简单地对思考题给出一个心智层面的解决方案, 然后开启后续的<code>Lab</code>。</p>
+</blockquote>
+<p>现在又到了我们的思考环节, 根据之前的描述, 将<code>SkipList</code>组织为<code>MemTable</code>好像很简单。但是别忘了，我们之前讲述的都是最基本的单点查询和写入，如果是更复杂的情形呢？ 比如：</p>
+<ol>
+<li>要查询前缀为<code>xxx</code>的所有键值对
+<ol>
+<li>很多个<code>Skiplist</code>中都可能存在这样的键值对, 我们需要依次遍历吗?</li>
+<li>有些旧<code>Skiplist</code>中的键值对已经被更新的<code>Skiplist</code>的数据覆盖了, 是否需要过滤? 如何过滤?</li>
+</ol>
+</li>
+<li>如何为<code>MemTable</code>实现迭代器?
+<ol>
+<li><code>KV</code>数据库的迭代器肯定是按照<code>key</code>的顺序从小大大排布</li>
+<li>多个<code>Skiplist</code>的键值对如何进行整合, 从而也实现从小大大的排布?</li>
+</ol>
+</li>
+</ol>
+<p>通过本节对<code>MemTable</code>的基本介绍, 以及进阶问题的思考, 你可以开始[Lab ]</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-准备工作-1"><a class="header" href="#1-准备工作-1">1 准备工作</a></h1>
+<p>本小节需要你修改的代码：
+-<code>src/memtable/memtable.cpp</code></p>
+<ul>
+<li><code>include/memtable/memtable.h</code> (Optional)</li>
+</ul>
+<p>同样的，我们先看看代码的头文件东一，从而了解我们的<code>MemTable</code>的整体实现思路:</p>
+<pre><code class="language-cpp">class MemTable {
+    // ...
+private:
+  std::shared_ptr&lt;SkipList&gt; current_table;
+  std::list&lt;std::shared_ptr&lt;SkipList&gt;&gt; frozen_tables;
+  size_t frozen_bytes;
+  std::shared_mutex frozen_mtx; // 冻结表的锁
+  std::shared_mutex cur_mtx;    // 活跃表的锁
+};
+</code></pre>
+<p>这里我们根据之前的原理介绍, 对之前的<code>SkipList</code>简单包装, 使用<code>list</code>保证一系列冻结的<code>Skiplist</code>。这里建议的规定是：
+<strong>最新的<code>Skiplist</code>放在<code>list</code>的<code>head</code>位置，最旧的<code>Skiplist</code>放在<code>list</code>的<code>tail</code>位置。</strong></p>
+<p>此外, 你在头文件中除了基础的<code>CRUD</code>函数外, 还会看到这个函数:</p>
+<pre><code class="language-cpp">  std::shared_ptr&lt;SST&gt; flush_last(SSTBuilder &amp;builder, std::string &amp;sst_path,
+                                  size_t sst_id,
+                                  std::shared_ptr&lt;BlockCache&gt; block_cache);
+</code></pre>
+<p>这个函数不是本<code>Lab</code>要求实现的函数, 但可以先进行简单的介绍便于认知整体架构。当<code>MemTable</code>中的数据量达到阈值时, 会调用这个函数将最古老的一个<code>SST</code>进行持久化, 形成一个<code>Level 0</code>的<code>SST</code>, 因此你可以理解为, <code>Skiplist</code>是和<code>Level 0 SST</code>的数据来源。</p>
+<h1 id="2-put-的实现-1"><a class="header" href="#2-put-的实现-1">2 put 的实现</a></h1>
+<p>你首先要实现的是<code>put</code>系列的函数:</p>
+<pre><code class="language-cpp">void MemTable::put_(const std::string &amp;key, const std::string &amp;value,
+                    uint64_t tranc_id) {
+  // TODO: Lab2.1 无锁版本的 put
+}
+
+void MemTable::put(const std::string &amp;key, const std::string &amp;value,
+                   uint64_t tranc_id) {
+  // TODO: Lab2.1 有锁版本的 put
+}
+
+void MemTable::put_batch(
+    const std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; &amp;kvs,
+    uint64_t tranc_id) {
+  // TODO: Lab2.1 有锁版本的 put_batch
+}
+</code></pre>
+<p>这里的<code>put</code>有多个版本, 分别是无锁版本和有锁版本的单次<code>put</code>以及有锁版本的批量<code>put</code>, 你必须按照语义实现这些函数, 因为后续上层组件调用的函数默认携带<code>_</code>后缀的函数版本是无锁操作版本。</p>
+<p>同时简单讲述以下如此设计的原因，某些并发控制只需要当前的<code>MemTable</code>组件控制即可, 但有些并发控制场景设计多个组件, 需要再上层进行, 例如后续事务提交时的冲突检测就是一个典型的案例。</p>
+<blockquote>
+<p>Hint: 你不仅仅需要做简单的<code>API</code>调用, 还需要判断什么时候<code>Skiplist</code>的容量超出阈值需要进行冻结</p>
+</blockquote>
+<h1 id="3-get-的实现"><a class="header" href="#3-get-的实现">3 get 的实现</a></h1>
+<p>接下来实现<code>get</code>的一系列函数, 同样包括无锁版本与有锁版本, 并且你还需要实现不同部分的分阶段查询:</p>
+<pre><code class="language-cpp">SkipListIterator MemTable::cur_get_(const std::string &amp;key, uint64_t tranc_id) {
+  // 检查当前活跃的memtable
+  // TODO: Lab2.1 从活跃跳表中查询
+  return SkipListIterator{};
+}
+
+SkipListIterator MemTable::frozen_get_(const std::string &amp;key,
+                                       uint64_t tranc_id) {
+  // TODO: Lab2.1 从冻结跳表中查询
+  // ? 你需要尤其注意跳表的遍历顺序
+  // ? tranc_id 参数可暂时忽略, 直接插入即可
+  return SkipListIterator{};
+  ;
+}
+
+SkipListIterator MemTable::get(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab2.1 查询, 建议复用 cur_get_ 和 frozen_get_
+  // ? 注意并发控制
+
+  return SkipListIterator{};
+}
+
+SkipListIterator MemTable::get_(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab2.1 查询, 无锁版本
+}
+</code></pre>
+<h1 id="4-remove-实现"><a class="header" href="#4-remove-实现">4 remove 实现</a></h1>
+<p>最后, 插入<code>value</code>为空的键值对表示对数据的删除标记, 同样有不同的版本:</p>
+<pre><code class="language-cpp">void MemTable::remove_(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO Lab2.1 无锁版本的remove
+}
+
+void MemTable::remove(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO Lab2.1 有锁版本的remove
+}
+
+void MemTable::remove_batch(const std::vector&lt;std::string&gt; &amp;keys,
+                            uint64_t tranc_id) {
+  // TODO Lab2.1 有锁版本的remove_batch
+}
+</code></pre>
+<h1 id="5-冻结活跃表"><a class="header" href="#5-冻结活跃表">5 冻结活跃表</a></h1>
+<p><code>Skiplist</code>的容量超出阈值需要进行冻结时需要调用下述函数。</p>
+<p>至于这个函数的调用实际，作者建议是在每次<code>put</code>后检查容量是否超出阈值, 然后同步地嗲用该函数, 当然你也可以启用一个后台线程进行周期性检查。</p>
+<pre><code class="language-cpp">void MemTable::frozen_cur_table_() {
+  // TODO: 冻结活跃表
+}
+
+void MemTable::frozen_cur_table() {
+  // TODO: 冻结活跃表, 有锁版本
+}
+</code></pre>
+<blockquote>
+<p><strong><code>Hint</code></strong></p>
+<ol>
+<li><code>src/config/config.cpp</code>中定义了一个配置文件的单例, 其会解析项目目录中的<code>config.toml</code>配置文件, 其中包含了各种阈值的推荐值</li>
+<li>你可以使用类似<code>TomlConfig::getInstance().getLsmPerMemSizeLimit()</code>的方法获取配置文件中定义的常量</li>
+<li>你可以修改<code>config.toml</code>配置文件的值, 但尽量不要新增配置项, 否则你需要自行修改<code>src/config/config.cpp</code>中的解析函数</li>
+</ol>
+</blockquote>
+<h1 id="6-测试"><a class="header" href="#6-测试">6 测试</a></h1>
+<p>当你完成上述所有功能后, 你可以通过如下测试:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_memtable
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from MemTableTest
+[ RUN      ] MemTableTest.BasicOperations
+[       OK ] MemTableTest.BasicOperations (2 ms)
+[ RUN      ] MemTableTest.RemoveOperations
+[       OK ] MemTableTest.RemoveOperations (0 ms)
+[ RUN      ] MemTableTest.FrozenTableOperations
+[       OK ] MemTableTest.FrozenTableOperations (0 ms)
+[ RUN      ] MemTableTest.LargeScaleOperations
+[       OK ] MemTableTest.LargeScaleOperations (0 ms)
+[ RUN      ] MemTableTest.MemorySizeTracking
+[       OK ] MemTableTest.MemorySizeTracking (0 ms)
+[ RUN      ] MemTableTest.MultipleFrozenTables
+[       OK ] MemTableTest.MultipleFrozenTables (0 ms)
+[ RUN      ] MemTableTest.ConcurrentOperations
+^C
+</code></pre>
+<p><code>ConcurrentOperations</code>需要你实现后续的迭代器功能。</p>
+<p>接下来你可以开启下一小节的<a href="lab2/./lab2.2-iterator.html">Lab</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-迭代器的作用"><a class="header" href="#1-迭代器的作用">1 迭代器的作用</a></h1>
+<p>我们需要实现整个<code>MemTable</code>的迭代器, 这算是本<code>Lab</code>的一个难点, 因为新的<code>SkipList</code>中的元素会导致旧的<code>SkipList</code>的部分元素失效, 因此不能简单地将不同<code>SkipList</code>的遍历结果拼接起来就完事儿。</p>
+<p>试想下面这个场景：</p>
+<pre><code class="language-bash">SkipList0: ("k1", "v1") -&gt; ("k4", "") -&gt; ("k5", "v3")
+SkipList1: ("k2", "v2") -&gt; ("k3", "v3") -&gt; ("k4", "v4")
+</code></pre>
+<p><code>SkipList0</code>中的<code>("k4", "")</code>表示删除了<code>"k4"</code>, 因此如果我们先消耗了<code>SkipList0</code>的迭代器, 那么<code>SkipList1</code>中就无法获取<code>"k3"</code>的不合法性, 因此需要对不同<code>SkipList</code>的迭代器进行<code>merge</code>操作来删除这些无效的元素。</p>
+<p>本实验的建议方案是:
+可以维护一个堆，堆首先根据<code>key</code>排序, 然后根据<code>SkipList id</code>排序, 因此相同的<code>key</code>, 后插入的记录肯定更靠近堆顶(因为<code>SkipList id</code>越小表示其越新), 因此堆顶的某个<code>key</code>一定是整个<code>MemTable</code>中该<code>key</code>的最新记录, 迭代器对该<code>key</code>只需要堆顶的这一个元素, 其余在取出堆顶后即可全部移除(因为首先按照<code>key</code>排序, 所以他们一定连续出现在堆顶)</p>
+<h1 id="2-堆去重的原理"><a class="header" href="#2-堆去重的原理">2 堆去重的原理</a></h1>
+<p>我们假设有以下两个 <code>SkipList：</code></p>
+<pre><code class="language-text">SkipList0 (id=0): ("k1", "v1") -&gt; ("k4", "") -&gt; ("k5", "v3")   // 最新的
+SkipList1 (id=1): ("k2", "v2") -&gt; ("k3", "v3") -&gt; ("k4", "v4")
+</code></pre>
+<p>我们借助之前<code>Skiplist</code>的迭代器, 遍历各个<code>Skiplist</code>, 把所有键值对按 <code>key</code> 排序后放入堆，排序依据是：</p>
+<ul>
+<li>先按 <code>key</code> 升序，即<code>key</code>越小越靠近堆顶</li>
+<li>对于相同的 <code>key</code>，选择<code>tranc_id</code> 较大（越新）的优先（越靠近堆顶）(这一条你可暂时哦忽略, 测试中<code>tranc_id</code>都是0)</li>
+<li>按照<code>SkipList</code>来源的新旧排序, 新<code>SkipList</code>的键值对更靠近堆顶(这里的<code>id</code>是构建堆时手动赋予的)</li>
+</ul>
+<blockquote>
+<p>最后的排序依据中, 这个新旧的顺序需要你手动指定, 无论你实现的排序是更大的<code>id</code>表示更新的<code>SKiplist</code>还是更小的<code>id</code>表示更新的<code>SKiplist</code>, 自身逻辑自洽即可
+建议将更新的<code>Skiplist</code>用更大的<code>id</code>标识, 因为<code>id</code>随新的<code>Skiplist</code>增长是很正常的事情</p>
+</blockquote>
+<p>遍历迭代器, 并逐一构建堆元素插入堆中, 最终的堆的示意图为:</p>
+<div align="center">
+  <img src="lab2/../images/Lab2/Heap.png" width="400">
+</div>
+<p>这里可以看到, <code>k4</code>的键值对中, 更新的跳表中的键值对更靠近堆顶, 当我们遍历这个堆并不断弹出元素时, 相同<code>key</code>的元素只能被迭代器(这个堆肯定是迭代器封装的一个成员变量)对外暴露一次, 其余相同<code>key</code>的键值对进行丢弃即可, 这样我们就能利用类似堆排序的功能, 同时完成了排序和去重。</p>
+<h1 id="3-基于堆的迭代器实现"><a class="header" href="#3-基于堆的迭代器实现">3 基于堆的迭代器实现</a></h1>
+<h2 id="31-代码框架介绍"><a class="header" href="#31-代码框架介绍">3.1 代码框架介绍</a></h2>
+<p>因此，本实验你首先要基于上述原理的介绍实现一个基于堆的迭代器。</p>
+<p>本小节需要你修改的代码：</p>
+<ul>
+<li><code>src/iterator/iterator.cpp</code></li>
+<li><code>include/iterator/iterator.h</code> (Optional)</li>
+<li><code>src/memtable/memtable.cpp</code></li>
+<li><code>include/memtable/memtable.h</code> (Optional)</li>
+</ul>
+<p>首先是<code>SearchItem</code>, 我们来看定义:</p>
+<pre><code class="language-cpp">class SstIterator;
+// *************************** SearchItem ***************************
+struct SearchItem {
+  std::string key_;
+  std::string value_;
+  uint64_t tranc_id_;
+  int idx_;
+  int level_; // 来自sst的level
+
+  SearchItem() = default;
+  SearchItem(std::string k, std::string v, int i, int l, uint64_t tranc_id)
+      : key_(std::move(k)), value_(std::move(v)), idx_(i), level_(l),
+        tranc_id_(tranc_id) {}
+};
+
+bool operator&lt;(const SearchItem &amp;a, const SearchItem &amp;b);
+bool operator&gt;(const SearchItem &amp;a, const SearchItem &amp;b);
+bool operator==(const SearchItem &amp;a, const SearchItem &amp;b);
+</code></pre>
+<p>其就是我们之前提到的每个堆节点的数据结构, 这里的构造函数中, <code>k, v, i</code>即为<code>key</code>, <code>value</code>, <code>id</code>(跳表的), <code>l</code>表示来源的层级, 现在我们都是在内存操作, 设为<code>0</code>即可, <code>tranc_id</code>不需要你理解, 直接赋值即可。</p>
+<p>然后是你要实现的迭代器<code>HeapIterator</code>的定义:</p>
+<pre><code class="language-cpp">class HeapIterator : public BaseIterator {
+  friend class SstIterator;
+
+public:
+  HeapIterator() = default;
+  HeapIterator(std::vector&lt;SearchItem&gt; item_vec, uint64_t max_tranc_id);
+
+  // ...
+
+private:
+  std::priority_queue&lt;SearchItem, std::vector&lt;SearchItem&gt;,
+                      std::greater&lt;SearchItem&gt;&gt;
+      items;
+  mutable std::shared_ptr&lt;value_type&gt; current; // 用于存储当前元素
+  uint64_t max_tranc_id_ = 0;
+};
+</code></pre>
+<p>这里的<code>priority_queue</code>就是我们之前提到的堆, <code>C++</code>的堆实际上就是优先队列。</p>
+<blockquote>
+<p>在<code>C++</code>中，当使用<code> std::priority_queue</code> 来实现小根堆（min-heap）时，你需要使用<code> std::greater&lt;SearchItem&gt;</code> 作为比较函数对象。感兴趣的同学可以查一查为什么要这么设计。</p>
+</blockquote>
+<h2 id="32-实现-searchitem-的比较规则"><a class="header" href="#32-实现-searchitem-的比较规则">3.2 实现 <code>SearchItem</code> 的比较规则</a></h2>
+<pre><code class="language-cpp">bool operator&lt;(const SearchItem &amp;a, const SearchItem &amp;b) {
+  // TODO: Lab2.2 实现比较规则
+  return true;
+}
+
+bool operator&gt;(const SearchItem &amp;a, const SearchItem &amp;b) {
+  // TODO: Lab2.2 实现比较规则
+  return true;
+}
+
+bool operator==(const SearchItem &amp;a, const SearchItem &amp;b) {
+  // TODO: Lab2.2 实现比较规则
+  return true;
+}
+</code></pre>
+<p>这里你需要按照之前介绍的比较规则进行代码补全。</p>
+<h2 id="33-实现构造函数"><a class="header" href="#33-实现构造函数">3.3 实现构造函数</a></h2>
+<p>接下来你需要实现<code>HeapIterator</code>的构造函数, 其参数就是已经遍历了所有<code>Skiplist</code>的迭代器构造的<code>vector</code>, <code>max_tranc_id</code>你可以暂时忽略:</p>
+<pre><code class="language-cpp">HeapIterator::HeapIterator(std::vector&lt;SearchItem&gt; item_vec,
+                           uint64_t max_tranc_id)
+    : max_tranc_id_(max_tranc_id) {
+  // TODO: Lab2.2 实现 HeapIterator 构造函数
+}
+</code></pre>
+<blockquote>
+<p>Hint: 构造完堆后, 是否需要额外的一些初始化的滤除?</p>
+</blockquote>
+<h2 id="34-实现自增函数"><a class="header" href="#34-实现自增函数">3.4 实现自增函数</a></h2>
+<p>接下来自增函数是最重要的, 自增函数的逻辑是:</p>
+<ol>
+<li>自增后的<code>key</code>不能是之前相同的<code>key</code>, 如果是(以为着实际上被前者覆写了), 则跳过</li>
+<li>自增后的键值对不能是删除标记, 即<code>value</code>为空</li>
+</ol>
+<pre><code class="language-cpp">BaseIterator &amp;HeapIterator::operator++() {
+  // TODO: Lab2.2 实现 ++ 重载
+  return *this;
+}
+</code></pre>
+<p>同时, 这些辅助函数的实现有助于你完成<code>:operator++()</code>和之前的构造函数:</p>
+<pre><code class="language-cpp">bool HeapIterator::top_value_legal() const {
+  // TODO: Lab2.2 判断顶部元素是否合法
+  // ? 被删除的值是不合法
+  // ? 不允许访问的事务创建或更改的键值对不合法(暂时忽略)
+  return true;
+}
+
+void HeapIterator::skip_by_tranc_id() {
+  // TODO: Lab2.2 后续的Lab实现, 只是作为标记提醒
+}
+</code></pre>
+<h2 id="34-其他运算符重载函数"><a class="header" href="#34-其他运算符重载函数">3.4 其他运算符重载函数</a></h2>
+<p>其他运算符重载函数就简单了很多, 但仍然是对你代码理解的考验:</p>
+<pre><code class="language-cpp">HeapIterator::pointer HeapIterator::operator-&gt;() const {
+  // TODO: Lab2.2 实现 -&gt; 重载
+  return nullptr;
+}
+
+HeapIterator::value_type HeapIterator::operator*() const {
+  // TODO: Lab2.2 实现 * 重载
+  return {};
+}
+
+BaseIterator &amp;HeapIterator::operator++() {
+  // TODO: Lab2.2 实现 ++ 重载
+  return *this;
+}
+
+bool HeapIterator::operator==(const BaseIterator &amp;other) const {
+  // TODO: Lab2.2 实现 == 重载
+  return true;
+}
+
+bool HeapIterator::operator!=(const BaseIterator &amp;other) const {
+  // TODO: Lab2.2 实现 != 重载
+  return true;
+}
+</code></pre>
+<p>其中<code>-&gt;</code>运算符重载, 你可以直接利用已有的成员变量<code>mutable std::shared_ptr&lt;value_type&gt; current</code>, 返回器地址, 但你需要在构造函数和自增函数中对其进行正确的初始化和重置, 下面这个函数即为初始化和重置的逻辑实现:</p>
+<pre><code class="language-cpp">void HeapIterator::update_current() const {
+  // current 缓存了当前键值对的值, 你实现 -&gt; 重载时可能需要
+  // TODO: Lab2.2 更新当前缓存值
+}
+</code></pre>
+<h1 id="4-memtable的迭代器"><a class="header" href="#4-memtable的迭代器">4 MemTable的迭代器</a></h1>
+<p>接下来, 有了<code>HeapIterator</code>, 你可以实现<code>MemTable</code>组件的全局迭代器了:</p>
+<pre><code class="language-cpp">HeapIterator MemTable::begin(uint64_t tranc_id) {
+  // TODO Lab 2.2 MemTable 的迭代器
+  return {};
+}
+
+HeapIterator MemTable::end() {
+  // TODO Lab 2.2 MemTable 的迭代器
+  return HeapIterator{};
+}
+</code></pre>
+<p>这里的逻辑就是利用之前实现的<code>HeapIterator</code>对整个<code>MemTable</code>进行遍历。</p>
+<h1 id="5-测试"><a class="header" href="#5-测试">5 测试</a></h1>
+<p>当你完成上述所有功能后, 你可以通过如下测试:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_memtable
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from MemTableTest
+[ RUN      ] MemTableTest.BasicOperations
+[       OK ] MemTableTest.BasicOperations (0 ms)
+[ RUN      ] MemTableTest.RemoveOperations
+[       OK ] MemTableTest.RemoveOperations (0 ms)
+[ RUN      ] MemTableTest.FrozenTableOperations
+[       OK ] MemTableTest.FrozenTableOperations (0 ms)
+[ RUN      ] MemTableTest.LargeScaleOperations
+[       OK ] MemTableTest.LargeScaleOperations (0 ms)
+[ RUN      ] MemTableTest.MemorySizeTracking
+[       OK ] MemTableTest.MemorySizeTracking (0 ms)
+[ RUN      ] MemTableTest.MultipleFrozenTables
+[       OK ] MemTableTest.MultipleFrozenTables (0 ms)
+[ RUN      ] MemTableTest.IteratorComplexOperations
+[       OK ] MemTableTest.IteratorComplexOperations (0 ms)
+[ RUN      ] MemTableTest.ConcurrentOperations
+[       OK ] MemTableTest.ConcurrentOperations (601 ms)
+[ RUN      ] MemTableTest.PreffixIter
+[       OK ] MemTableTest.PreffixIter (0 ms)
+[----------] 9 tests from MemTableTest (602 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 1 test suite ran. (602 ms total)
+[  PASSED  ] 9 tests.
+</code></pre>
+<p>接下来你可以开启下一小节的<a href="lab2/./lab2.3-range-query.html">Lab</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-概述-1"><a class="header" href="#1-概述-1">1 概述</a></h1>
+<p>还记得我们对<code>Skiplist</code>实现了前缀查询和谓词查询吗, 他们本质上都是范围查询, 这一小节, 你将基于已有的<code>Skiplist</code>的前缀查询和谓词查询接口, 实现<code>MemTable</code>的谓词查询。</p>
+<p>本小节需要你修改的代码：
+-<code>src/memtable/memtable.cpp</code></p>
+<ul>
+<li><code>include/memtable/memtable.h</code> (Optional)</li>
+</ul>
+<h1 id="2-实现-iters_preffix"><a class="header" href="#2-实现-iters_preffix">2 实现 iters_preffix</a></h1>
+<pre><code class="language-cpp">HeapIterator MemTable::iters_preffix(const std::string &amp;preffix,
+                                     uint64_t tranc_id) {
+
+  // TODO Lab 2.3 MemTable 的前缀迭代器
+
+  return {};
+}
+</code></pre>
+<p>你需要借助<code>Skiplist</code>的<code>begin_preffix</code>完成这个<code>MemTable::iters_preffix</code>, 你可以从返回值类型推断出, 我们仍然需要借助<code>HeapIterator</code>进行去重和排序。</p>
+<p>这里需要注意的还是自定义的排序<code>id</code>(就是<code>SearchItem</code>里面的成员变量<code>idx_</code>), 你需要在构造<code>HeapIterator</code>手动赋予<code>idx_</code>正确的整型值。</p>
+<p>另外，<code>tranc_id</code>相关的滤除操作你可以暂时忽略, 直接传入<code>SearchItem</code>的构造函数即可。</p>
+<blockquote>
+<p>需要注意的是, 这个返回的迭代器从语义上是<code>begin</code>迭代器, 其使用方式是判断自身是否<code>is_valid</code>()以及<code>is_end()</code>, 不同于<code>C++ STL</code>中给定一对迭代器确定范围的风格。这也算是作者前期项目设计的不足之处，介于次代码和实验还是初版，能用能跑就行。</p>
+</blockquote>
+<h1 id="3-实现-iters_monotony_predicate"><a class="header" href="#3-实现-iters_monotony_predicate">3 实现 iters_monotony_predicate</a></h1>
+<pre><code class="language-cpp">std::optional&lt;std::pair&lt;HeapIterator, HeapIterator&gt;&gt;
+MemTable::iters_monotony_predicate(
+    uint64_t tranc_id, std::function&lt;int(const std::string &amp;)&gt; predicate) {
+  // TODO Lab 2.3 MemTable 的谓词查询迭代器起始范围
+  return std::nullopt;
+}
+</code></pre>
+<p>和<code>iters_preffix</code>类似, 只不过查询逻辑从特化的前缀查询变成了适用性更广泛的谓词查询, 注意事项也都差不多, 同样是借助<code>Skiplist</code>的<code>iters_monotony_predicate(predicate)</code>获取初步的结果, 再用<code>HeapIterator</code>区中。</p>
+<h1 id="4-测试-1"><a class="header" href="#4-测试-1">4 测试</a></h1>
+<p>完成上面的函数后, 你应该可以通过所有的test/test_memtable.cpp的单元测试:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_memtable
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from MemTableTest
+[ RUN      ] MemTableTest.BasicOperations
+[       OK ] MemTableTest.BasicOperations (0 ms)
+[ RUN      ] MemTableTest.RemoveOperations
+[       OK ] MemTableTest.RemoveOperations (0 ms)
+[ RUN      ] MemTableTest.FrozenTableOperations
+[       OK ] MemTableTest.FrozenTableOperations (0 ms)
+[ RUN      ] MemTableTest.LargeScaleOperations
+[       OK ] MemTableTest.LargeScaleOperations (1 ms)
+[ RUN      ] MemTableTest.MemorySizeTracking
+[       OK ] MemTableTest.MemorySizeTracking (0 ms)
+[ RUN      ] MemTableTest.MultipleFrozenTables
+[       OK ] MemTableTest.MultipleFrozenTables (0 ms)
+[ RUN      ] MemTableTest.IteratorComplexOperations
+[       OK ] MemTableTest.IteratorComplexOperations (0 ms)
+[ RUN      ] MemTableTest.ConcurrentOperations
+[       OK ] MemTableTest.ConcurrentOperations (604 ms)
+[ RUN      ] MemTableTest.PreffixIter
+[       OK ] MemTableTest.PreffixIter (0 ms)
+[ RUN      ] MemTableTest.IteratorPreffix
+[       OK ] MemTableTest.IteratorPreffix (0 ms)
+[ RUN      ] MemTableTest.ItersPredicate_Base
+[       OK ] MemTableTest.ItersPredicate_Base (0 ms)
+[ RUN      ] MemTableTest.ItersPredicate_Large
+[       OK ] MemTableTest.ItersPredicate_Large (13 ms)
+[----------] 12 tests from MemTableTest (620 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (620 ms total)
+[  PASSED  ] 12 tests.
+</code></pre>
+<p>到此为止, <code>Lab2</code>的实验结束, 恭喜你完成本实验!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-概述-2"><a class="header" href="#1-概述-2">1 概述</a></h1>
+<p>这一章的开头我们再次搬出我们的经典架构图:</p>
+<p><img src="lab3/../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
+<p>通过<a href="lab3/../lab1/lab1-skiplist.html">Lab1</a>和<a href="lab3/../lab2/lab2-memtable.html">Lab2</a>的学习，我们已经初步完成了<code>LSM Tree</code>中内存的基础读写组件, 这一章我们将眼光从内存迁移到磁盘, 实现<code>SST</code>相关的内容。</p>
+<p>从架构图中我们知道，<code>SST</code>文件是<code>LSM Tree</code>中持久化的存储文件，其中<code>Level 0</code>的<code>SST</code>存储了<code>MemTable</code>中单个<code>Skiplist</code>的数据，并且提供了<code>LSM Tree</code>中数据的有序性。因此对于一个磁盘中的文件, 我们肯定需要实现文件的编解码设计。其中编码设计用于将内存的<code>Skiplist</code>类的实例转化为<code>SST</code>文件, 而读取<code>SST</code>中的某些键值对时我们需要将文件进行解码并读取数据到内存。因此这一章中编解码是一大主题内容。而且相对之前常驻内存的<code>MemTable</code>而言, 这里的编解码代码的实现更为复杂, 尤其是<code>Debug</code>难度比之前要大上不少。</p>
+<p>此外，我们从架构图中还了解到，不同<code>Level</code>的<code>SST</code>是需要再容量超出阈值时进行合并(<code>Compact</code>)的, 但<code>Compact</code>在本实验中是由更上层的控制结构实现的, 因此本节实验你不需要担心<code>Compact</code>, 这是后续<code>Lab</code>的内容, 这里提一嘴只是为了有助于从理论上理解其运行机制。</p>
+<h1 id="2-sst-的结构"><a class="header" href="#2-sst-的结构">2 SST 的结构</a></h1>
+<p>从架构图中我们了解到，不同<code>Level</code>之间的容量呈指数增长, 其中最小的<code>Level 0</code>的<code>SST</code>也是<code>SkipList</code>的大小, 而<code>SkipList</code>实例在内存中是由多个链表组成的, 查询速度基本上和红黑树差不多。但假若我们想从<code>SST</code>中查一个键值对，总不可能把整个<code>SST</code>都解码放到内存中吧? 要知道高层<code>Level</code>的<code>SST</code>是可以轻易增长到<code>GB</code>的大小的。因此，<code>SST</code>必须进行内部的切分, 这里切分形成的一块数据我们称之为<code>Block</code>。因此对<code>Block</code>的组织管理就是<code>SST</code>设计的核心内容。<code>Toni-LSM</code>的<code>SST</code>文件结构如下:</p>
+<p><img src="lab3/../images/lab3/SST.drawio.png" alt="SST-Arch" /></p>
+<p><code>SST</code>文件由多个<code>Block</code>组成，每个<code>Block_x</code>内部暂且看成一个黑箱, 只需要知道其是我们查询的基本IO单元即可。 每个<code>Block_x</code>后会追加32位的哈希值，用于校验。每个<code>Block</code>对应一个<code>Meta</code>, 每个<code>Meta</code>记录这个<code>Block</code>在<code>SST</code>文件中的偏移量、第一个和最后一个<code>key</code>的元数据(长度和大小)。</p>
+<p>这里，<code>Block</code>是基本的IO单元，这就意味着在查询一个<code>key</code>时, 其所在的整个<code>Block</code>的数据都会被解码并加载到内存中的。你可以类比操作系统中的<code>Page</code>, 其是内存和磁盘之间的基本IO单元。</p>
+<p>另一方面，在查询一个<code>key</code>时，如何确定查哪一个<code>Block</code>呢? 这里就需要将<code>SST</code>中的<code>Extra Information</code>中的元数据提前加载到内存中, 这些元数据能够定位到<code>Meta Section</code>, 而<code>Meta Section</code>是一个数组, 其中每个<code>Meta_x</code>记录了对应<code>Block</code>在整个<code>SST</code>中的位置， 可以以此来快速对指定为位置的二进制数据进行解码。</p>
+<blockquote>
+<p>你肯定能想到, 作为基本的IO单元, 我们肯定会为其实现一个缓存池的, 这样可以避免每次查询时都进行磁盘IO。</p>
+</blockquote>
+<p>心细的你肯定也注意到, 这里有一个<code>Bloom Section</code>, 这其实就是布隆过滤器中的<code>bit</code>位数组, 其用处是拦截无效的访问, 这会在后续的<code>Lab</code>中进行详细讲解。</p>
+<h1 id="3-block的结构"><a class="header" href="#3-block的结构">3 Block的结构</a></h1>
+<p>现在我们来看<code>Block</code>的结构, <code>Block</code>是<code>SST</code>中的基本IO单元，即<code>SST</code>的每个查询最终是在<code>Blcok</code>中定位到具体的键值对的, 其结构为:</p>
+<p><img src="lab3/../images/lab3/Block.png" alt="Block" /></p>
+<blockquote>
+<p>上图的<code>B</code>表示一个字节</p>
+</blockquote>
+<p>一个<code>Block</code>包含:<code>Data Section</code>、<code>Offset Section</code>和<code>Extra Information</code>三部分:</p>
+<ul>
+<li><code>Data Section</code>: 存放所有的数据, 也就是<code>key</code>和<code>value</code>的序列化数据
+<ul>
+<li>每一对<code>key</code>和<code>value</code>都是一个<code>Entry</code>， 编码信息包括<code>key_len</code>、<code>key</code>、<code>value_len</code>和<code>value</code>
+<ul>
+<li><code>key_len</code>和<code>value_len</code>都是<code>2B</code>的<code>uint16_t</code>类型, 用于表示<code>key</code>和<code>value</code>的长度</li>
+<li><code>key</code>和<code>value</code>就是对应长度的字节数, 因此需要用<code>varlen</code>来表示。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>Offset Section</code>: 存放所有<code>Entry</code>的偏移量, 用于快速定位</li>
+<li><code>Extra Information</code>: 存放<code>num_of_elements</code>, 也就是<code>Entry</code>的数量</li>
+</ul>
+<p>这样编码满足了最基本的要求, 从最后的2个字节可以知道<code>Block</code>包含了多少<code>kv</code>对, 再从<code>Offset Section</code>中查询对应的<code>kv</code>对数据的偏移。</p>
+<h1 id="4-思考"><a class="header" href="#4-思考">4 思考</a></h1>
+<p>现在有了<code>Block</code>和<code>SST</code>的设计方案, 你可以思考如下几个问题:</p>
+<ol>
+<li><code>Blcok</code>和<code>SST</code>是如何构建的? <code>Block</code>如何进行划分?</li>
+<li><code>Block</code>内部如何实现迭代器吗?</li>
+<li><code>SST</code>的迭代器是单独设计, 还是对已有<code>Blcok</code>迭代器的封装? 如何封装?</li>
+<li><code>Block</code>的缓存池如何设计?</li>
+<li>布隆过滤器和缓存池的设计各自有什么作用? 他们的功能是否重复?</li>
+</ol>
+<p>当你对上述问题有过简单思考后, 你可以开启本次<code>Lab</code>了, 你需要有一定心理准备, 这一大章节的<code>Lab</code>原比之前的<code>MemTable</code>和<code>Skiplist</code>复杂, 现在开始第一部分 <a href="lab3/./lab3.1-Block.html">Block 实现</a>。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="阶段1-block"><a class="header" href="#阶段1-block">阶段1-Block</a></h1>
+<p>本阶段主要实现<code>Block</code>类, 包括<code>Block</code>的编码格式, 编解码方法、以及<code>Block</code>的迭代器和相关的查询功能。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-准备工作-2"><a class="header" href="#1-准备工作-2">1 准备工作</a></h1>
+<p>老套路, 我们先理一下<code>Block</code>的数据结构, 看看头文件定义:</p>
+<pre><code class="language-cpp">// include/block/block.h
+class Block : public std::enable_shared_from_this&lt;Block&gt; {
+  friend BlockIterator;
+
+private:
+  std::vector&lt;uint8_t&gt; data; // 对应架构图的 Data
+  std::vector&lt;uint16_t&gt; offsets; // 对应架构图的 Offset
+  size_t capacity;
+
+  struct Entry {
+    std::string key;
+    std::string value;
+    uint64_t tranc_id;
+  };
+  // ...
+};
+</code></pre>
+<p>这里可能涉及C++的新特性:</p>
+<pre><code class="language-cpp">public std::enable_shared_from_this&lt;Block&gt;
+</code></pre>
+<p><code>std::enable_shared_from_this</code> 是 C++11 引入的一个标准库特性，它允许一个对象安全地创建指向自身的<code>std::shared_ptr</code>。这里先简单说明一下, 后续实现迭代器的时候就知道其作用了。</p>
+<p>这里主要对<code>data</code>和<code>offsets</code>这两个数据结构进行说明, 他们在构建阶段和读取阶段存在一定区别, 首先还是给出架构图:</p>
+<p><img src="lab3/../images/lab3/Block.png" alt="Block" /></p>
+<p><strong>构建阶段</strong>
+当我们从<code>Skiplist</code>拿到数据构建一个<code>SST</code>时, <code>SST</code>需要逐个构建<code>Block</code>, 这个<code>Block</code>在构建时步骤如下:</p>
+<ol>
+<li>逐个将编码的键值对(也就是<code>Entry</code>)写入<code>data</code>数组, 同时将每个<code>Entry</code>的偏移量记录在内存中的<code>offsets</code>数组中。</li>
+<li>当这个<code>Block</code>容量达到阈值时, <code>Block</code>构建完成, 你需要将<code>offsets</code>数组写入到<code>Block</code>的末尾。</li>
+<li>还需要再<code>Block</code>末尾写入一个<code>Entry Num</code>值, 用于标识这个<code>Block</code>中键值对的数量, 从而在解码时获取<code>Offset</code>的其实位置(因为每个<code>Entry Offset</code>大小是固定的整型值)</li>
+<li>当前<code>Block</code>构建完成, <code>SST</code>开始构建下一个<code>Block</code>。</li>
+</ol>
+<blockquote>
+<p>这里之所以将先将键值对持久化到<code>data</code>数组, 而元信息暂存于内存的<code>offsets</code>数组, 是因为<code>Data</code>是在数据部分之后的的<code>Offset</code>部分的偏移需要再键值对完全写入<code>Data</code>部分后才能确定</p>
+</blockquote>
+<p><strong>解码阶段</strong>
+解码阶段, 直接将<code>Data</code>、<code>Offset</code>解码形成内存中的<code>Block</code>的实例以为上层组件提供查询功能，同时如果实现了缓存池，需要再缓存池中进行记录。</p>
+<h1 id="2-代码实现"><a class="header" href="#2-代码实现">2 代码实现</a></h1>
+<p>你需要修改的函数都在<code>src/block/block.cpp</code>中。</p>
+<h2 id="21-block-编码和解码"><a class="header" href="#21-block-编码和解码">2.1 Block 编码和解码</a></h2>
+<p>这里你先不要管这个<code>Block</code>是哪里来的, 就当它已经存在, 实现编码和解码的功能:</p>
+<pre><code class="language-cpp">std::vector&lt;uint8_t&gt; Block::encode() {
+  // TODO Lab 3.1 编码单个类实例形成一段字节数组
+  return {};
+}
+
+std::shared_ptr&lt;Block&gt; Block::decode(const std::vector&lt;uint8_t&gt; &amp;encoded,
+                                     bool with_hash) {
+  // TODO Lab 3.1 解码字节数组形成类实例
+  return nullptr;
+}
+</code></pre>
+<p>这里特别说明, <code>encode</code>时的数据是不包括校验的哈希值的 因为哈希值是在<code>SST</code>控制<code>Block</code>构建过程中计算的, 但在<code>decode</code>时可以通过<code>with_hash</code>参数来指示传入的<code>encoded</code>是否包含哈希值, 如果包含哈希值, 则需要先校验哈希值是否正确, 校验失败则抛出异常。</p>
+<blockquote>
+<p>之所以<code>encode</code>不计算哈希值, <code>decode</code>按需计算哈希值, 其实是作者初版代码设计不佳, 这里先不纠结了, 后续可能会进行优化, 如果你有优化方案, 可对代码进行修改后提PR</p>
+</blockquote>
+<blockquote>
+<p>编解码时你需要注意数据的格式, 如果校验格式错误, 你需要抛出异常, 否则错误将非常难以<code>Debug</code></p>
+</blockquote>
+<h2 id="22-局部数据编解码函数"><a class="header" href="#22-局部数据编解码函数">2.2 局部数据编解码函数</a></h2>
+<p>对于二进制数据, 你需要按照设计的编码结构获取其<code>key</code>, <code>value</code>和<code>tranc_id</code>, 这里我们实现几个辅助函数:</p>
+<pre><code class="language-cpp">// 从指定偏移量获取entry的key
+std::string Block::get_key_at(size_t offset) const {
+  // TODO Lab 3.1 从指定偏移量获取entry的key
+  return "";
+}
+
+// 从指定偏移量获取entry的value
+std::string Block::get_value_at(size_t offset) const {
+  // TODO Lab 3.1 从指定偏移量获取entry的value
+  return "";
+}
+
+uint16_t Block::get_tranc_id_at(size_t offset) const {
+  // TODO Lab 3.1 从指定偏移量获取entry的tranc_id
+  // ? 你不需要理解tranc_id的具体含义, 直接返回即可
+  return 0;
+}
+</code></pre>
+<h2 id="23-构建-block"><a class="header" href="#23-构建-block">2.3 构建 Block</a></h2>
+<p><code>Block</code>构建是由<code>SST</code>控制的, 其会不断地调用下面这个函数添加键值对:</p>
+<pre><code class="language-cpp">bool Block::add_entry(const std::string &amp;key, const std::string &amp;value,
+                      uint64_t tranc_id, bool force_write) {
+  // TODO Lab 3.1 添加一个键值对到block中
+  // ? 返回值说明：
+  // ? true: 成功添加
+  // ? false: block已满, 拒绝此次添加
+  return false;
+}
+</code></pre>
+<p>这里需要注意, <code>force_write</code>参数表示是否强制写入, 如果为<code>true</code>, 则不管<code>Block</code>是否已满, 都强制写入, 否则如果<code>Block</code>已满, 则拒绝此次写入。</p>
+<p><code>Block</code>是否已满的判断将当前数据容量与成员变量<code>capacity</code>进行比较, <code>capacity</code>在<code>Block</code>初始化时由<code>SST</code>传入, 表示一个<code>Block</code>的最大容量。</p>
+<blockquote>
+<p>如果你需要一些使用<code>config.toml</code>中预定义的一些阈值变量或者其他常来那个, 你也可以通过<code>TomlConfig::getInstance().getXXX</code>的方式获取</p>
+</blockquote>
+<h2 id="24-二分查询"><a class="header" href="#24-二分查询">2.4 二分查询</a></h2>
+<p><code>Block</code>构建时是通过<code>SST</code>遍历<code>Skiplist</code>的迭代器调用<code>add_entry</code>实现的, 因此<code>Block</code>的数据是有序的, 你需要实现一个二分查找函数, 用于在<code>Block</code>中查找指定<code>key</code>所属的<code>Entry</code>在<code>offset</code>元数据中的索引:</p>
+<pre><code class="language-cpp">std::optional&lt;size_t&gt; Block::get_idx_binary(const std::string &amp;key,
+                                            uint64_t tranc_id) {
+  // TODO Lab 3.1 使用二分查找获取key对应的索引
+  return std::nullopt;
+}
+</code></pre>
+<p><code>get_value_binary</code>函数中会调用<code>get_idx_binary</code>函数, 并返回指定<code>key</code>的<code>value</code>:</p>
+<pre><code class="language-cpp">// 使用二分查找获取value
+// 要求在插入数据时有序插入
+std::optional&lt;std::string&gt; Block::get_value_binary(const std::string &amp;key,
+                                                   uint64_t tranc_id) {
+  auto idx = get_idx_binary(key, tranc_id);
+  if (!idx.has_value()) {
+    return std::nullopt;
+  }
+
+  return get_value_at(offsets[*idx]);
+}
+</code></pre>
+<h1 id="3-测试-2"><a class="header" href="#3-测试-2">3 测试</a></h1>
+<p>如果成功完成了上述的所有函数, 你应该如下运行测试并得到结果:</p>
+<pre><code class="language-bash">✗ xmake
+[100%]: build ok, spent 1.94s
+✗ xmake run test_block
+[==========] Running 10 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 10 tests from BlockTest
+[ RUN      ] BlockTest.DecodeTest
+[       OK ] BlockTest.DecodeTest (0 ms)
+[ RUN      ] BlockTest.EncodeTest
+[       OK ] BlockTest.EncodeTest (0 ms)
+[ RUN      ] BlockTest.BinarySearchTest
+[       OK ] BlockTest.BinarySearchTest (0 ms)
+[ RUN      ] BlockTest.EdgeCasesTest
+[       OK ] BlockTest.EdgeCasesTest (0 ms)
+[ RUN      ] BlockTest.LargeDataTest
+[       OK ] BlockTest.LargeDataTest (0 ms)
+[ RUN      ] BlockTest.ErrorHandlingTest
+[       OK ] BlockTest.ErrorHandlingTest (1 ms)
+[ RUN      ] BlockTest.IteratorTest
+test/test_block.cpp:225: Failure
+Expected equality of these values:
+  count
+    Which is: 0
+  test_data.size()
+    Which is: 100
+</code></pre>
+<p>你应该能通过<code>BlockTest.IteratorTest</code>之前的所有单元测试, <code>BlockTest.IteratorTest</code>这个测试会测试<code>Block</code>的迭代器功能, 因为<code>Block</code>的迭代器功能还没有实现, 所以会失败, 这是符合预期的。</p>
+<h1 id="4-下一步"><a class="header" href="#4-下一步">4 下一步</a></h1>
+<p>现在进入下一步前, 你可以先思考:</p>
+<ol>
+<li>如何实现<code>Block</code>的迭代器</li>
+<li>为什么我们需要让<code>Block</code>类继承<code>std::enable_shared_from_this&lt;Block&gt;</code>?</li>
+</ol>
+<p>带着这些疑问, 欢迎开启下一章</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="1-blockiterator的设计"><a class="header" href="#1-blockiterator的设计">1 BlockIterator的设计</a></h1>
+<p>现在实现我们的<code>Block</code>的迭代器。通过<code>Block</code>的编码格式可知, 只需要知道当前的索引, 就可以在<code>Block</code>中查询该索引的<code>kv</code>对, 因此迭代器只需要记录当前索引和原始<code>Block</code>的引用就可以了。</p>
+<p>这也就是之前提到的<code>std::enable_shared_from_this</code>的作用，让我们的<code>BlockIterator</code>可以使用<code>Block</code>的智能指针, 为什么这样设计呢? 因为<code>BlockIterator</code>的生命周期是依赖于于<code>Block</code>的, 如果<code>Block</code>的生命周期结束, <code>BlockIterator</code>依然存在, 那么就会产生悬空指针, 因此我们需要使用智能指针来管理<code>Block</code>的生命周期。</p>
+<p>这么说可能有点迷糊, 我们直接看头文件定义:</p>
+<pre><code class="language-cpp">class BlockIterator {
+  // ...
+private:
+  std::shared_ptr&lt;Block&gt; block;                   // 指向所属的 Block
+  size_t current_index;                           // 当前位置的索引
+  uint64_t tranc_id_;                             // 当前事务 id
+  mutable std::optional&lt;value_type&gt; cached_value; // 缓存当前值
+};
+</code></pre>
+<blockquote>
+<p><code>cached_value</code>其实算是个小优化, 尽管有索引就在<code>block</code>中进行二分查找, 但这里还是用一个值进行缓存, 因为迭代器可能被反复读取值, 而每次读取值需要按照数据编码的格式进行解码, 在多次读取迭代器值的情况下, 缓存起来从理论上速度回更快</p>
+</blockquote>
+<p>这里的<code>BlockIterator</code>不同于我们之前的<code>HeapIterator</code>, 它并不持有我们实际的键值对数据, 而进行对<code>Block</code>中的键值对位置进行定位, 因此就需要保证其指针<code>block</code>是有效的, 在现代<code>C++</code>中, 我们应该避免使用裸指针, 因此这里使用了<code>std::shared_ptr</code>来保证其指针<code>block</code>有效的。但<code> std::shared_ptr&lt;Block&gt; block</code>肯定是某个<code>Blcok</code>的<code>this</code>指针, 而<code>this</code>是裸指针, 因此我们需要使<code>Block</code>继承<code>std::enable_shared_from_this</code>, 这样就可以通过<code>shared_from_this()</code>获取代表<code>this</code>指针的<code>shared_ptr&lt;Block&gt;</code>了。</p>
+<blockquote>
+<p>需要注意的是, 使用<code>shared_from_this()</code>时, 需要保证类的实例被<code>shared_ptr</code>管理, 否则会抛出异常, 具体可以查询相关资料, 这里不过多介绍。</p>
+</blockquote>
+<p>其余成员变量应该很好理解, <code>current_index</code>记录当前索引, <code>tranc_id_</code>记录当前事务 id, <code>cached_value</code>缓存当前值。</p>
+<h1 id="2-实现-blockiterator"><a class="header" href="#2-实现-blockiterator">2 实现 <code>BlockIterator</code></a></h1>
+<p>本部分你需要修改的代码文件为：</p>
+<ul>
+<li><code>src/block/block_iterator.cpp</code></li>
+<li><code>include/block/block_iterator.h</code> (Optional)</li>
+</ul>
+<h2 id="21-构造函数实现"><a class="header" href="#21-构造函数实现">2.1 构造函数实现</a></h2>
+<p>实现构造函数，传入一个 <code>block</code> 和 <code>key</code>，以及事务 <code>tranc_id</code>, 这里在构造迭代器时就将迭代器移动到指定<code>key</code>的位置(还需要满足<code>tranc_id</code>的可见性, 不过现在你可以先忽略这个可见性的判断逻辑)。</p>
+<p>你需要借助之前实现的<code>Block</code>的成员函数来实现这的移动逻辑:</p>
+<pre><code class="language-cpp">BlockIterator::BlockIterator(std::shared_ptr&lt;Block&gt; b, const std::string &amp;key,
+                             uint64_t tranc_id)
+    : block(b), tranc_id_(tranc_id), cached_value(std::nullopt) {
+  // TODO: Lab3.2 创建迭代器时直接移动到指定的key位置
+  // ? 你需要借助之前实现的 Block 类的成员函数
+}
+</code></pre>
+<h2 id="22-运算符重载"><a class="header" href="#22-运算符重载">2.2 运算符重载</a></h2>
+<p>迭代器的运算符重载是你需要实现的基础成员函数:</p>
+<pre><code class="language-cpp">BlockIterator::pointer BlockIterator::operator-&gt;() const {
+  // TODO: Lab3.2 -&gt; 重载
+  return nullptr;
+}
+
+BlockIterator &amp;BlockIterator::operator++() {
+  // TODO: Lab3.2 ++ 重载
+  // ? 在后续的Lab实现事务后，你可能需要对这个函数进行返修
+  return *this;
+}
+
+bool BlockIterator::operator==(const BlockIterator &amp;other) const {
+  // TODO: Lab3.2 == 重载
+  return true;
+}
+
+bool BlockIterator::operator!=(const BlockIterator &amp;other) const {
+  // TODO: Lab3.2 != 重载
+  return true;
+}
+
+BlockIterator::value_type BlockIterator::operator*() const {
+  // TODO: Lab3.2 * 重载
+  return {};
+}
+</code></pre>
+<blockquote>
+<p>这些运算符重载函数中, 你也不需要考虑<code>tranc_id</code>的相关逻辑, 只是你需要记得, 后续实现了事务功能后, 本<code>Lab</code>的部分逻辑需要进行调整</p>
+</blockquote>
+<h2 id="23-辅助函数"><a class="header" href="#23-辅助函数">2.3 辅助函数</a></h2>
+<p>这里有一些作者提供的可能用用的辅助函数, 你可以按选择实现他们, 也可以忽略他们, 自己按照自己的理解创建自定义的成员函数:</p>
+<pre><code class="language-cpp">void BlockIterator::update_current() const {
+  // TODO: Lab3.2 更新当前指针
+  // ? 该函数是可选的实现, 你可以采用自己的其他方案实现-&gt;, 而不是使用
+  // ? cached_value 来缓存当前指针
+}
+
+void BlockIterator::skip_by_tranc_id() {
+  // TODO: Lab3.2 * 跳过事务ID
+  // ? 只是进行标记以供你在后续Lab实现事务功能后修改
+  // ? 现在你不需要考虑这个函数
+}
+</code></pre>
+<p>这里的<code>skip_by_tranc_id</code>只是标记后续<code>Lab</code>实现事务带来的的一些逻辑上的变化, 你现在不需要实现。
+而<code>update_current</code>则是一个可选的实现, 其用来更新缓存的键值对变量, 你可以采用自己的其他方案实现<code>-&gt;</code>, 而不是使用成员变量<code>cached_value</code>和这个函数。</p>
+<h1 id="4-获取迭代器的接口函数实现"><a class="header" href="#4-获取迭代器的接口函数实现">4 获取迭代器的接口函数实现</a></h1>
+<p>现在我们已经实现了<code>BlockIterator</code>的, 我们需要实现<code>Block</code>的<code>begin</code>和<code>end</code>函数将<code>BlockIterator</code>进行返回给外部组件使用:</p>
+<pre><code class="language-cpp">BlockIterator Block::begin(uint64_t tranc_id) {
+  // TODO Lab 3.2 获取begin迭代器
+  return BlockIterator(nullptr, 0, 0);
+}
+
+BlockIterator Block::end() {
+  // TODO Lab 3.2 获取end迭代器
+  return BlockIterator(nullptr, 0, 0);
+}
+</code></pre>
+<p>这里的<code>tranc_id</code>同样可以暂时忽略, 但对应类实例的值还是要在构造函数中初始化的。</p>
+<h1 id="5-测试-1"><a class="header" href="#5-测试-1">5 测试</a></h1>
+<p>测试代码在<code>test/test_block.cpp</code>中, 你在完成上述组件实现后的测试结果预期为:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_block
+[==========] Running 10 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 10 tests from BlockTest
+[ RUN      ] BlockTest.DecodeTest
+[       OK ] BlockTest.DecodeTest (0 ms)
+[ RUN      ] BlockTest.EncodeTest
+[       OK ] BlockTest.EncodeTest (0 ms)
+[ RUN      ] BlockTest.BinarySearchTest
+[       OK ] BlockTest.BinarySearchTest (0 ms)
+[ RUN      ] BlockTest.EdgeCasesTest
+[       OK ] BlockTest.EdgeCasesTest (0 ms)
+[ RUN      ] BlockTest.LargeDataTest
+[       OK ] BlockTest.LargeDataTest (0 ms)
+[ RUN      ] BlockTest.ErrorHandlingTest
+[       OK ] BlockTest.ErrorHandlingTest (1 ms)
+[ RUN      ] BlockTest.IteratorTest
+[       OK ] BlockTest.IteratorTest (0 ms)
+[ RUN      ] BlockTest.PredicateTest
+test/test_block.cpp:277: Failure
+Value of: result.has_value()
+  Actual: false
+Expected: true
+
+unknown file: Failure
+C++ exception with description "bad optional access" thrown in the test body.
+</code></pre>
+<p><code>PredicateTest</code>需要你在完成下一小节的任务后, 才能通过。</p>
+<p>现在你可以开启下一节的<a href="lab3/./lab3.3-iter-query.html">范围查询</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-32-基于迭代器的查询"><a class="header" href="#lab-32-基于迭代器的查询">Lab 3.2 基于迭代器的查询</a></h1>
+<h1 id="1-范围查询函数"><a class="header" href="#1-范围查询函数">1 范围查询函数</a></h1>
+<p>鉴于你之前已经在<code>Skiplist</code>组件和<code>MemTable</code>组件中实现了<code>range_query</code>功能, 这里我们需要再<code>Blcok</code>组件中再次实现<code>range_query</code>功能。(同样, 查询是单调的), 只不过这里操作的基础数据从内存中的跳表变成了类似数组结构的<code>Block</code>。</p>
+<p>你需要修改的文件:</p>
+<ul>
+<li><code>src/block/block.cpp</code></li>
+<li><code>include/block/block.h</code> (Optional)</li>
+</ul>
+<h2 id="11-前缀查询"><a class="header" href="#11-前缀查询">1.1 前缀查询</a></h2>
+<p>具体修改的函数为:</p>
+<pre><code class="language-cpp">std::optional&lt;
+    std::pair&lt;std::shared_ptr&lt;BlockIterator&gt;, std::shared_ptr&lt;BlockIterator&gt;&gt;&gt;
+Block::iters_preffix(uint64_t tranc_id, const std::string &amp;preffix) {
+  // TODO Lab 3.2 获取前缀匹配的区间迭代器
+  return std::nullopt;
+}
+</code></pre>
+<p>这里返回一对迭代器,标识前缀匹配的区间。(同样是和<code>STL</code>风格一致的左闭右开区间), 如果查询不到, 返回<code>std::nullopt</code>。</p>
+<blockquote>
+<p><code>std::optional</code>是一个智能指针, 其用法非常类似<code>Rust</code>的<code>Option</code></p>
+</blockquote>
+<h2 id="12-谓词查询"><a class="header" href="#12-谓词查询">1.2 谓词查询</a></h2>
+<p>具体修改的函数为:</p>
+<pre><code class="language-cpp">// 返回第一个满足谓词的位置和最后一个满足谓词的位置
+// 如果不存在, 范围nullptr
+// 谓词作用于key, 且保证满足谓词的结果只在一段连续的区间内, 例如前缀匹配的谓词
+// 返回的区间是闭区间, 开区间需要手动对返回值自增
+// predicate返回值:
+//   0: 满足谓词
+//   &gt;0: 不满足谓词, 需要向右移动
+//   &lt;0: 不满足谓词, 需要向左移动
+std::optional&lt;
+    std::pair&lt;std::shared_ptr&lt;BlockIterator&gt;, std::shared_ptr&lt;BlockIterator&gt;&gt;&gt;
+Block::get_monotony_predicate_iters(
+    uint64_t tranc_id, std::function&lt;int(const std::string &amp;)&gt; predicate) {
+  // TODO: Lab 3.2 使用二分查找获取满足谓词的区间迭代器
+  return std::nullopt;
+}
+</code></pre>
+<p>这里返回一对迭代器,标识谓词查询的区间。(同样是和<code>STL</code>风格一致的左闭右开区间), 如果查询不到, 返回<code>std::nullopt</code>。</p>
+<h1 id="2-测试"><a class="header" href="#2-测试">2 测试</a></h1>
+<p>如下运行测试， 预期结果为：</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_block
+[==========] Running 10 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 10 tests from BlockTest
+[ RUN      ] BlockTest.DecodeTest
+[       OK ] BlockTest.DecodeTest (0 ms)
+[ RUN      ] BlockTest.EncodeTest
+[       OK ] BlockTest.EncodeTest (0 ms)
+[ RUN      ] BlockTest.BinarySearchTest
+[       OK ] BlockTest.BinarySearchTest (0 ms)
+[ RUN      ] BlockTest.EdgeCasesTest
+[       OK ] BlockTest.EdgeCasesTest (0 ms)
+[ RUN      ] BlockTest.LargeDataTest
+[       OK ] BlockTest.LargeDataTest (0 ms)
+[ RUN      ] BlockTest.ErrorHandlingTest
+[       OK ] BlockTest.ErrorHandlingTest (1 ms)
+[ RUN      ] BlockTest.IteratorTest
+[       OK ] BlockTest.IteratorTest (0 ms)
+[ RUN      ] BlockTest.PredicateTest
+[       OK ] BlockTest.PredicateTest (2 ms) # 到这里成功就表示你完成了本`Lab`
+[ RUN      ] BlockTest.TrancIteratorTest
+[       OK ] BlockTest.TrancIteratorTest (0 ms)
+[ RUN      ] BlockTest.TrancPredicateTest
+[       OK ] BlockTest.TrancPredicateTest (0 ms)
+[----------] 10 tests from BlockTest (4 ms total)
+
+[----------] Global test environment tear-down
+[==========] 10 tests from 1 test suite ran. (4 ms total)
+[  PASSED  ] 10 tests.
+</code></pre>
+<p>其中最后两个测试<code>BlockTest.TrancIteratorTest</code>和<code>BlockTest.TrancPredicateTest</code>需要后续实现事务功能后才能正常通过。只要你通过了<code>BlockTest.PredicateTest</code>前的测试, 即视为完成了本<code>Lab</code>。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="阶段2-sst"><a class="header" href="#阶段2-sst">阶段2-SST</a></h1>
+<p>在完成了<code>Block</code>组件和<code>BlockIterator</code>组件之后, 我们就可以开始实现<code>SST</code>组件了。</p>
+<p><code>SST</code>组件的核心工作就是管理器内部的多个<code>Block</code>组件, 利用<code>Block</code>组件和<code>BlockIterator</code>的各种<code>CRUD</code>和初始化、构建等基本接口，来对外提供各类功能。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-34-blockmeta"><a class="header" href="#lab-34-blockmeta">Lab 3.4 BlockMeta</a></h1>
+<h1 id="1-概述-3"><a class="header" href="#1-概述-3">1 概述</a></h1>
+<p>让我们再次回顾<code>SST</code>的结构:</p>
+<p><img src="lab3/../images/lab3/SST.drawio.png" alt="SST-Arch" /></p>
+<p>可以看到, <code>SST</code>中有一个<code>Meta Section</code>, 它是一个数组, 数组中的每一个元素对应一个<code>Block</code>的元信息, 这些元信息包括:</p>
+<ul>
+<li>该<code>Block</code>在<code>SST</code>中的偏移量</li>
+<li>该<code>Block</code>的第一个<code>key</code>和最后一个<code>key</code>的元数据</li>
+</ul>
+<p>在<code>SST</code>构建完成后, 其文件持久化在文件系统中, 但<code>Meta Section</code>会被加载到内存中并解码为控制结构, 因为没有<code>Meta Section</code>的元数据, 我们是没法对<code>SST</code>按照<code>Block</code>进行索引的。在<code>Toni-LSM</code>中, 这里的元数据在内存中用类<code>BlockMeta</code>来表示, 其定义为:</p>
+<pre><code class="language-cpp">class BlockMeta {
+  friend class BlockMetaTest;
+
+public:
+  size_t offset;         // 块在文件中的偏移量
+  std::string first_key; // 块的第一个key
+  std::string last_key;  // 块的最后一个key
+  static void encode_meta_to_slice(std::vector&lt;BlockMeta&gt; &amp;meta_entries,
+                                   std::vector&lt;uint8_t&gt; &amp;metadata);
+  static std::vector&lt;BlockMeta&gt;
+  decode_meta_from_slice(const std::vector&lt;uint8_t&gt; &amp;metadata);
+  BlockMeta();
+  BlockMeta(size_t offset, const std::string &amp;first_key,
+            const std::string &amp;last_key);
+};
+</code></pre>
+<p>这里的每一个<code>BlockMeta</code>对应一个<code>Block</code>的元数据, 包含了我们之前介绍的编码方式的基础数据结构。</p>
+<h1 id="2-代码实现-1"><a class="header" href="#2-代码实现-1">2 代码实现</a></h1>
+<p>你需要修改的代码文件为:</p>
+<ul>
+<li><code>src/block/blockmeta.cpp</code></li>
+<li><code>include/block/blockmeta.h</code> (Optional)</li>
+</ul>
+<h2 id="21-编码函数"><a class="header" href="#21-编码函数">2.1 编码函数</a></h2>
+<p>你需要实现将内存中的元信息编码到二进制数组的函数:</p>
+<pre><code class="language-cpp">void BlockMeta::encode_meta_to_slice(std::vector&lt;BlockMeta&gt; &amp;meta_entries,
+                                     std::vector&lt;uint8_t&gt; &amp;metadata) {
+  // TODO: Lab 3.4 将内存中所有`Blcok`的元数据编码为二进制字节数组
+  // ? 输入输出都由参数中的引用给定, 你不需要自己创建`vector`
+}
+</code></pre>
+<h2 id="22-解码函数"><a class="header" href="#22-解码函数">2.2 解码函数</a></h2>
+<p>你需要实现将二进制数组解码到内存中的函数:</p>
+<pre><code class="language-cpp">std::vector&lt;BlockMeta&gt;
+BlockMeta::decode_meta_from_slice(const std::vector&lt;uint8_t&gt; &amp;metadata) {
+  // TODO: Lab 3.4 将二进制字节数组解码为内存中的`Blcok`元数据
+  return {};
+}
+</code></pre>
+<blockquote>
+<p>这里的编码解码都是以代表整个<code>SST</code>元信息的<code>vector</code>数组进行的, 上层组件并不要求你实现单个<code>Block</code>的编解码函数, 但需要你可以选择实现单个<code>Block</code>的编解码函数作为辅助函数</p>
+</blockquote>
+<h1 id="3-测试-3"><a class="header" href="#3-测试-3">3 测试</a></h1>
+<p>测试代码在<code>test/test_blockmeta.cpp</code>中, 正常情况下, 完成本小节<code>Lab</code>后你应该可以通过所有的测试:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_blockmeta
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from BlockMetaTest
+[ RUN      ] BlockMetaTest.BasicEncodeDecodeTest
+[       OK ] BlockMetaTest.BasicEncodeDecodeTest (0 ms)
+[ RUN      ] BlockMetaTest.EmptyMetaTest
+[       OK ] BlockMetaTest.EmptyMetaTest (0 ms)
+[ RUN      ] BlockMetaTest.SpecialCharTest
+[       OK ] BlockMetaTest.SpecialCharTest (0 ms)
+[ RUN      ] BlockMetaTest.ErrorHandlingTest
+[       OK ] BlockMetaTest.ErrorHandlingTest (0 ms)
+[ RUN      ] BlockMetaTest.LargeDataTest
+[       OK ] BlockMetaTest.LargeDataTest (0 ms)
+[ RUN      ] BlockMetaTest.OrderTest
+[       OK ] BlockMetaTest.OrderTest (0 ms)
+[----------] 6 tests from BlockMetaTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 6 tests.
+</code></pre>
+<h1 id="4-思考-1"><a class="header" href="#4-思考-1">4 思考</a></h1>
+<p>我们实现了<code>Block</code>类的元信息<code>BlcokMeta</code>, 现在可以思考一下, <code>BlcokMeta</code>如何被上层使用? 其如何加速查询?</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-35-sstbuilder"><a class="header" href="#lab-35-sstbuilder">Lab 3.5 SSTBuilder</a></h1>
+<h1 id="1-概述-4"><a class="header" href="#1-概述-4">1 概述</a></h1>
+<p><code>SSTBuilder</code>是<code>SST</code>文件的构造器, 它将<code>MemTable</code>中的数据进行编码并写入磁盘形成<code>SST</code>。不过这里我们并没有设计到不同组件数据的控制，这是由更上层的结构控制的。</p>
+<p><strong>SST和SSTBuilder的关系是什么？</strong>
+区别在于，<code>SSTBuilder</code>这个类的实例只在<code>SST文件</code>构建过程中存在, 其是可写的数据结构, 构建过程可不断添加键值对进行编码。在其调用<code>Build</code>后，其会将自身数据编码为<code>SST文件</code>， 并转化为一个<code>SST</code>类实例, <code>SST</code>类本质上就是<code>SST文件</code>的控制结构。</p>
+<p>这样说起来可能不好理解, 让我们结合代码将这个过程具体化, 先看其<code>SSTBuilder</code>和<code>SST</code>的头文件定义:</p>
+<pre><code class="language-cpp">class SST : public std::enable_shared_from_this&lt;SST&gt; {
+  // ...  
+private:
+  FileObj file;
+  std::vector&lt;BlockMeta&gt; meta_entries;
+  uint32_t bloom_offset;
+  uint32_t meta_block_offset;
+  size_t sst_id;
+  std::string first_key;
+  std::string last_key;
+  std::shared_ptr&lt;BloomFilter&gt; bloom_filter;
+  std::shared_ptr&lt;BlockCache&gt; block_cache;
+  uint64_t min_tranc_id_ = UINT64_MAX;
+  uint64_t max_tranc_id_ = 0;
+
+public:
+  // ...
+};
+
+class SSTBuilder {
+private:
+  Block block;
+  std::string first_key;
+  std::string last_key;
+  std::vector&lt;BlockMeta&gt; meta_entries;
+  std::vector&lt;uint8_t&gt; data;
+  size_t block_size;
+  std::shared_ptr&lt;BloomFilter&gt; bloom_filter; // 后续Lab内容
+  uint64_t min_tranc_id_ = UINT64_MAX; // 后续Lab内容
+  uint64_t max_tranc_id_ = 0; // 后续Lab内容
+
+public:
+  // 创建一个sst构建器, 指定目标block的大小
+  SSTBuilder(size_t block_size, bool has_bloom); 
+  // 添加一个key-value对
+  void add(const std::string &amp;key, const std::string &amp;value, uint64_t tranc_id);
+  // 完成当前block的构建, 即将block写入data, 并创建新的block
+  void finish_block();
+  // 构建sst, 将sst写入文件并返回SST描述类
+  std::shared_ptr&lt;SST&gt; build(size_t sst_id, const std::string &amp;path,
+                             std::shared_ptr&lt;BlockCache&gt; block_cache);
+};
+</code></pre>
+<p><strong>构建流程</strong></p>
+<ol>
+<li>当<code>MemTable</code>的大小超过阈值后，准备将<code>MemTable</code>中最旧的<code>Frozen Table</code>刷出为<code>SST</code>。</li>
+<li>先创建一个<code>SSTBuilder</code>, 按照迭代器的顺序遍历<code>Frozen Table</code>，将<code>key-value</code>对添加到<code>SSTBuilder</code>中:
+<ol>
+<li><code>SSTBuilder</code>会有一个当前的<code>block</code>, 其<code>add</code>函数首先会调用<code>Block::add_entry</code>将迭代器的<code>kv</code>对插入</li>
+<li>如果当前的<code>block</code>容量超出阈值<code>block_size</code>, 就调用<code>finish_block</code>将其编码到<code>data</code>, 并清楚当前<code>block</code>相关数据, 开启下一个<code>block</code>的构建</li>
+<li>遍历完成迭代器的所有<code>kv</code>对的插入后, 调用<code>build</code>将所有的数据刷到文件系统, 并返回一个<code>SST</code>描述类</li>
+</ol>
+</li>
+</ol>
+<p><strong>读取流程</strong></p>
+<ol>
+<li><code>SST</code>构造函数会绑定一个文件描述符(这里是我自定义封装的文件读取类<code>FileObj file</code>)</li>
+<li><code>SST</code>中的<code>meta entries</code>从第一次读取后就常驻内存(第一次读取可以是构造函数, 也可以是第一次<code>get</code>)</li>
+<li>上层调用<code>get</code>时, 会从元数据<code>meta_entries</code>中进行二分查找, 找到对应的<code>block</code>的偏移量, 然后调用文件描述对象<code>file</code>从磁盘中读取</li>
+<li>读取后的字节流交由<code>Block::decode</code>解码得到内存中的<code>Block</code></li>
+<li>内存中的<code>Block</code>调用之前实现的查询函数完成二分查询</li>
+</ol>
+<h1 id="2-代码实现-2"><a class="header" href="#2-代码实现-2">2 代码实现</a></h1>
+<h2 id="21-sstbuilderadd-函数"><a class="header" href="#21-sstbuilderadd-函数">2.1 SSTBuilder::add 函数</a></h2>
+<blockquote>
+<p>Hint: 建议你先看完下一个<code>finish_block</code>函数的描述后再开始写代码, 因为这个函数中需要使用<code>finish_block</code>函数</p>
+</blockquote>
+<p><code>SSTBuilder</code>中的<code>block</code>成员变量即为当前正在构建的<code>Block</code>, <code>add</code>函数不断接受上部组件传递的键值对, 并将键值对添加到当前正在构建的<code>Block</code>中, 当<code>Block</code>容量达到阈值时, 将<code>Block</code>写入<code>data</code>数组, 并创建一个新的<code>Block</code>继续构建。
+构建结束后，这个<code>data</code>数组就包含了多个<code>Block</code>的编码字节, 经进一步处理后即可刷盘形成<code>SST</code>:</p>
+<pre><code class="language-cpp">void SSTBuilder::add(const std::string &amp;key, const std::string &amp;value,
+                     uint64_t tranc_id) {
+  // TODO: Lab 3.5 添加键值对
+}
+</code></pre>
+<blockquote>
+<p>这里的一些阈值参数你同样可以采取<code>TomlConfig::getInstance().getxxx()</code>的方法获取配置文件<code>config.toml</code>中定义的常量</p>
+</blockquote>
+<h2 id="22-sstbuilderfinish_block-函数"><a class="header" href="#22-sstbuilderfinish_block-函数">2.2 SSTBuilder::finish_block 函数</a></h2>
+<p>根据前文介绍可知, <code>SSTBuilder</code>只有一个活跃的<code>block</code>支持插入键值对进行构建, 超出阈值后其将会编码为<code>Block</code>并写入<code>data</code>数组, 这个过程就是<code>SSTBuilder::finish_block</code>函数的功能:</p>
+<pre><code class="language-cpp">void SSTBuilder::finish_block() {
+  // TODO: Lab 3.5 构建块
+  // ? 当 add 函数发现当前的`block`容量超出阈值时，需要将其编码到`data`，并清空`block`
+}
+</code></pre>
+<h2 id="23-sstbuilderbuild-函数"><a class="header" href="#23-sstbuilderbuild-函数">2.3 SSTBuilder::build 函数</a></h2>
+<p>当上层组件已经将所有键值对插入到<code>SSTBuilder</code>中后，调用<code>SSTBuilder::build</code>函数即可完成<code>SST</code>文件的构建, 其会返回一个<code>SST</code>指针:</p>
+<pre><code class="language-cpp">std::shared_ptr&lt;SST&gt;
+SSTBuilder::build(size_t sst_id, const std::string &amp;path,
+                  std::shared_ptr&lt;BlockCache&gt; block_cache) {
+  // TODO 3.5 构建一个SST
+  return nullptr;
+}
+</code></pre>
+<p>参数列表中, <code>sst_id</code>表示<code>SST</code>的编号， <code>path</code>表示<code>SST</code>文件的存储路径， <code>block_cache</code>表示<code>Block</code>的缓存池。你相比也意识到, 当<code>SST</code>从内存持久化为文件后, 其<code>IO</code>必然收到缓存池的管理, 这也是我们之后的内容, 这里你也不需要考虑缓存池的指针, 当它为<code>nullptr</code>即可</p>
+<blockquote>
+<p>这里涉及到文件IO的操作, 作者已经在<code>include/utils</code>中封装了一个文件IO管理类<code>FileObj</code>, 你需要阅读<code>include/utils/files.h</code>即<code>src/utils/files.cpp</code>来了解其使用方法</p>
+</blockquote>
+<h1 id="3-测试-4"><a class="header" href="#3-测试-4">3 测试</a></h1>
+<p>待更新...</p>
+<div style="break-before: page; page-break-before: always;"></div><p>TODO</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

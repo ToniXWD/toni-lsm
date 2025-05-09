@@ -1,0 +1,281 @@
+<!DOCTYPE HTML>
+<html lang="ch" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Lab 2.3 范围查询 - toni-lsm-lab</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">toni-lsm-lab</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="1-概述"><a class="header" href="#1-概述">1 概述</a></h1>
+<p>还记得我们对<code>Skiplist</code>实现了前缀查询和谓词查询吗, 他们本质上都是范围查询, 这一小节, 你将基于已有的<code>Skiplist</code>的前缀查询和谓词查询接口, 实现<code>MemTable</code>的谓词查询。</p>
+<p>本小节需要你修改的代码：
+-<code>src/memtable/memtable.cpp</code></p>
+<ul>
+<li><code>include/memtable/memtable.h</code> (Optional)</li>
+</ul>
+<h1 id="2-实现-iters_preffix"><a class="header" href="#2-实现-iters_preffix">2 实现 iters_preffix</a></h1>
+<pre><code class="language-cpp">HeapIterator MemTable::iters_preffix(const std::string &amp;preffix,
+                                     uint64_t tranc_id) {
+
+  // TODO Lab 2.3 MemTable 的前缀迭代器
+
+  return {};
+}
+</code></pre>
+<p>你需要借助<code>Skiplist</code>的<code>begin_preffix</code>完成这个<code>MemTable::iters_preffix</code>, 你可以从返回值类型推断出, 我们仍然需要借助<code>HeapIterator</code>进行去重和排序。</p>
+<p>这里需要注意的还是自定义的排序<code>id</code>(就是<code>SearchItem</code>里面的成员变量<code>idx_</code>), 你需要在构造<code>HeapIterator</code>手动赋予<code>idx_</code>正确的整型值。</p>
+<p>另外，<code>tranc_id</code>相关的滤除操作你可以暂时忽略, 直接传入<code>SearchItem</code>的构造函数即可。</p>
+<blockquote>
+<p>需要注意的是, 这个返回的迭代器从语义上是<code>begin</code>迭代器, 其使用方式是判断自身是否<code>is_valid</code>()以及<code>is_end()</code>, 不同于<code>C++ STL</code>中给定一对迭代器确定范围的风格。这也算是作者前期项目设计的不足之处，介于次代码和实验还是初版，能用能跑就行。</p>
+</blockquote>
+<h1 id="3-实现-iters_monotony_predicate"><a class="header" href="#3-实现-iters_monotony_predicate">3 实现 iters_monotony_predicate</a></h1>
+<pre><code class="language-cpp">std::optional&lt;std::pair&lt;HeapIterator, HeapIterator&gt;&gt;
+MemTable::iters_monotony_predicate(
+    uint64_t tranc_id, std::function&lt;int(const std::string &amp;)&gt; predicate) {
+  // TODO Lab 2.3 MemTable 的谓词查询迭代器起始范围
+  return std::nullopt;
+}
+</code></pre>
+<p>和<code>iters_preffix</code>类似, 只不过查询逻辑从特化的前缀查询变成了适用性更广泛的谓词查询, 注意事项也都差不多, 同样是借助<code>Skiplist</code>的<code>iters_monotony_predicate(predicate)</code>获取初步的结果, 再用<code>HeapIterator</code>区中。</p>
+<h1 id="4-测试"><a class="header" href="#4-测试">4 测试</a></h1>
+<p>完成上面的函数后, 你应该可以通过所有的test/test_memtable.cpp的单元测试:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_memtable
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from MemTableTest
+[ RUN      ] MemTableTest.BasicOperations
+[       OK ] MemTableTest.BasicOperations (0 ms)
+[ RUN      ] MemTableTest.RemoveOperations
+[       OK ] MemTableTest.RemoveOperations (0 ms)
+[ RUN      ] MemTableTest.FrozenTableOperations
+[       OK ] MemTableTest.FrozenTableOperations (0 ms)
+[ RUN      ] MemTableTest.LargeScaleOperations
+[       OK ] MemTableTest.LargeScaleOperations (1 ms)
+[ RUN      ] MemTableTest.MemorySizeTracking
+[       OK ] MemTableTest.MemorySizeTracking (0 ms)
+[ RUN      ] MemTableTest.MultipleFrozenTables
+[       OK ] MemTableTest.MultipleFrozenTables (0 ms)
+[ RUN      ] MemTableTest.IteratorComplexOperations
+[       OK ] MemTableTest.IteratorComplexOperations (0 ms)
+[ RUN      ] MemTableTest.ConcurrentOperations
+[       OK ] MemTableTest.ConcurrentOperations (604 ms)
+[ RUN      ] MemTableTest.PreffixIter
+[       OK ] MemTableTest.PreffixIter (0 ms)
+[ RUN      ] MemTableTest.IteratorPreffix
+[       OK ] MemTableTest.IteratorPreffix (0 ms)
+[ RUN      ] MemTableTest.ItersPredicate_Base
+[       OK ] MemTableTest.ItersPredicate_Base (0 ms)
+[ RUN      ] MemTableTest.ItersPredicate_Large
+[       OK ] MemTableTest.ItersPredicate_Large (13 ms)
+[----------] 12 tests from MemTableTest (620 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (620 ms total)
+[  PASSED  ] 12 tests.
+</code></pre>
+<p>到此为止, <code>Lab2</code>的实验结束, 恭喜你完成本实验!</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lab2/lab2.2-iterator.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../lab3/lab3-SST.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lab2/lab2.2-iterator.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../lab3/lab3-SST.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

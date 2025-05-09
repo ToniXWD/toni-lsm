@@ -1,0 +1,423 @@
+<!DOCTYPE HTML>
+<html lang="ch" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Lab 2.2 迭代器 - toni-lsm-lab</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">toni-lsm-lab</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="1-迭代器的作用"><a class="header" href="#1-迭代器的作用">1 迭代器的作用</a></h1>
+<p>我们需要实现整个<code>MemTable</code>的迭代器, 这算是本<code>Lab</code>的一个难点, 因为新的<code>SkipList</code>中的元素会导致旧的<code>SkipList</code>的部分元素失效, 因此不能简单地将不同<code>SkipList</code>的遍历结果拼接起来就完事儿。</p>
+<p>试想下面这个场景：</p>
+<pre><code class="language-bash">SkipList0: ("k1", "v1") -&gt; ("k4", "") -&gt; ("k5", "v3")
+SkipList1: ("k2", "v2") -&gt; ("k3", "v3") -&gt; ("k4", "v4")
+</code></pre>
+<p><code>SkipList0</code>中的<code>("k4", "")</code>表示删除了<code>"k4"</code>, 因此如果我们先消耗了<code>SkipList0</code>的迭代器, 那么<code>SkipList1</code>中就无法获取<code>"k3"</code>的不合法性, 因此需要对不同<code>SkipList</code>的迭代器进行<code>merge</code>操作来删除这些无效的元素。</p>
+<p>本实验的建议方案是:
+可以维护一个堆，堆首先根据<code>key</code>排序, 然后根据<code>SkipList id</code>排序, 因此相同的<code>key</code>, 后插入的记录肯定更靠近堆顶(因为<code>SkipList id</code>越小表示其越新), 因此堆顶的某个<code>key</code>一定是整个<code>MemTable</code>中该<code>key</code>的最新记录, 迭代器对该<code>key</code>只需要堆顶的这一个元素, 其余在取出堆顶后即可全部移除(因为首先按照<code>key</code>排序, 所以他们一定连续出现在堆顶)</p>
+<h1 id="2-堆去重的原理"><a class="header" href="#2-堆去重的原理">2 堆去重的原理</a></h1>
+<p>我们假设有以下两个 <code>SkipList：</code></p>
+<pre><code class="language-text">SkipList0 (id=0): ("k1", "v1") -&gt; ("k4", "") -&gt; ("k5", "v3")   // 最新的
+SkipList1 (id=1): ("k2", "v2") -&gt; ("k3", "v3") -&gt; ("k4", "v4")
+</code></pre>
+<p>我们借助之前<code>Skiplist</code>的迭代器, 遍历各个<code>Skiplist</code>, 把所有键值对按 <code>key</code> 排序后放入堆，排序依据是：</p>
+<ul>
+<li>先按 <code>key</code> 升序，即<code>key</code>越小越靠近堆顶</li>
+<li>对于相同的 <code>key</code>，选择<code>tranc_id</code> 较大（越新）的优先（越靠近堆顶）(这一条你可暂时哦忽略, 测试中<code>tranc_id</code>都是0)</li>
+<li>按照<code>SkipList</code>来源的新旧排序, 新<code>SkipList</code>的键值对更靠近堆顶(这里的<code>id</code>是构建堆时手动赋予的)</li>
+</ul>
+<blockquote>
+<p>最后的排序依据中, 这个新旧的顺序需要你手动指定, 无论你实现的排序是更大的<code>id</code>表示更新的<code>SKiplist</code>还是更小的<code>id</code>表示更新的<code>SKiplist</code>, 自身逻辑自洽即可
+建议将更新的<code>Skiplist</code>用更大的<code>id</code>标识, 因为<code>id</code>随新的<code>Skiplist</code>增长是很正常的事情</p>
+</blockquote>
+<p>遍历迭代器, 并逐一构建堆元素插入堆中, 最终的堆的示意图为:</p>
+<div align="center">
+  <img src="../images/Lab2/Heap.png" width="400">
+</div>
+<p>这里可以看到, <code>k4</code>的键值对中, 更新的跳表中的键值对更靠近堆顶, 当我们遍历这个堆并不断弹出元素时, 相同<code>key</code>的元素只能被迭代器(这个堆肯定是迭代器封装的一个成员变量)对外暴露一次, 其余相同<code>key</code>的键值对进行丢弃即可, 这样我们就能利用类似堆排序的功能, 同时完成了排序和去重。</p>
+<h1 id="3-基于堆的迭代器实现"><a class="header" href="#3-基于堆的迭代器实现">3 基于堆的迭代器实现</a></h1>
+<h2 id="31-代码框架介绍"><a class="header" href="#31-代码框架介绍">3.1 代码框架介绍</a></h2>
+<p>因此，本实验你首先要基于上述原理的介绍实现一个基于堆的迭代器。</p>
+<p>本小节需要你修改的代码：</p>
+<ul>
+<li><code>src/iterator/iterator.cpp</code></li>
+<li><code>include/iterator/iterator.h</code> (Optional)</li>
+<li><code>src/memtable/memtable.cpp</code></li>
+<li><code>include/memtable/memtable.h</code> (Optional)</li>
+</ul>
+<p>首先是<code>SearchItem</code>, 我们来看定义:</p>
+<pre><code class="language-cpp">class SstIterator;
+// *************************** SearchItem ***************************
+struct SearchItem {
+  std::string key_;
+  std::string value_;
+  uint64_t tranc_id_;
+  int idx_;
+  int level_; // 来自sst的level
+
+  SearchItem() = default;
+  SearchItem(std::string k, std::string v, int i, int l, uint64_t tranc_id)
+      : key_(std::move(k)), value_(std::move(v)), idx_(i), level_(l),
+        tranc_id_(tranc_id) {}
+};
+
+bool operator&lt;(const SearchItem &amp;a, const SearchItem &amp;b);
+bool operator&gt;(const SearchItem &amp;a, const SearchItem &amp;b);
+bool operator==(const SearchItem &amp;a, const SearchItem &amp;b);
+</code></pre>
+<p>其就是我们之前提到的每个堆节点的数据结构, 这里的构造函数中, <code>k, v, i</code>即为<code>key</code>, <code>value</code>, <code>id</code>(跳表的), <code>l</code>表示来源的层级, 现在我们都是在内存操作, 设为<code>0</code>即可, <code>tranc_id</code>不需要你理解, 直接赋值即可。</p>
+<p>然后是你要实现的迭代器<code>HeapIterator</code>的定义:</p>
+<pre><code class="language-cpp">class HeapIterator : public BaseIterator {
+  friend class SstIterator;
+
+public:
+  HeapIterator() = default;
+  HeapIterator(std::vector&lt;SearchItem&gt; item_vec, uint64_t max_tranc_id);
+
+  // ...
+
+private:
+  std::priority_queue&lt;SearchItem, std::vector&lt;SearchItem&gt;,
+                      std::greater&lt;SearchItem&gt;&gt;
+      items;
+  mutable std::shared_ptr&lt;value_type&gt; current; // 用于存储当前元素
+  uint64_t max_tranc_id_ = 0;
+};
+</code></pre>
+<p>这里的<code>priority_queue</code>就是我们之前提到的堆, <code>C++</code>的堆实际上就是优先队列。</p>
+<blockquote>
+<p>在<code>C++</code>中，当使用<code> std::priority_queue</code> 来实现小根堆（min-heap）时，你需要使用<code> std::greater&lt;SearchItem&gt;</code> 作为比较函数对象。感兴趣的同学可以查一查为什么要这么设计。</p>
+</blockquote>
+<h2 id="32-实现-searchitem-的比较规则"><a class="header" href="#32-实现-searchitem-的比较规则">3.2 实现 <code>SearchItem</code> 的比较规则</a></h2>
+<pre><code class="language-cpp">bool operator&lt;(const SearchItem &amp;a, const SearchItem &amp;b) {
+  // TODO: Lab2.2 实现比较规则
+  return true;
+}
+
+bool operator&gt;(const SearchItem &amp;a, const SearchItem &amp;b) {
+  // TODO: Lab2.2 实现比较规则
+  return true;
+}
+
+bool operator==(const SearchItem &amp;a, const SearchItem &amp;b) {
+  // TODO: Lab2.2 实现比较规则
+  return true;
+}
+</code></pre>
+<p>这里你需要按照之前介绍的比较规则进行代码补全。</p>
+<h2 id="33-实现构造函数"><a class="header" href="#33-实现构造函数">3.3 实现构造函数</a></h2>
+<p>接下来你需要实现<code>HeapIterator</code>的构造函数, 其参数就是已经遍历了所有<code>Skiplist</code>的迭代器构造的<code>vector</code>, <code>max_tranc_id</code>你可以暂时忽略:</p>
+<pre><code class="language-cpp">HeapIterator::HeapIterator(std::vector&lt;SearchItem&gt; item_vec,
+                           uint64_t max_tranc_id)
+    : max_tranc_id_(max_tranc_id) {
+  // TODO: Lab2.2 实现 HeapIterator 构造函数
+}
+</code></pre>
+<blockquote>
+<p>Hint: 构造完堆后, 是否需要额外的一些初始化的滤除?</p>
+</blockquote>
+<h2 id="34-实现自增函数"><a class="header" href="#34-实现自增函数">3.4 实现自增函数</a></h2>
+<p>接下来自增函数是最重要的, 自增函数的逻辑是:</p>
+<ol>
+<li>自增后的<code>key</code>不能是之前相同的<code>key</code>, 如果是(以为着实际上被前者覆写了), 则跳过</li>
+<li>自增后的键值对不能是删除标记, 即<code>value</code>为空</li>
+</ol>
+<pre><code class="language-cpp">BaseIterator &amp;HeapIterator::operator++() {
+  // TODO: Lab2.2 实现 ++ 重载
+  return *this;
+}
+</code></pre>
+<p>同时, 这些辅助函数的实现有助于你完成<code>:operator++()</code>和之前的构造函数:</p>
+<pre><code class="language-cpp">bool HeapIterator::top_value_legal() const {
+  // TODO: Lab2.2 判断顶部元素是否合法
+  // ? 被删除的值是不合法
+  // ? 不允许访问的事务创建或更改的键值对不合法(暂时忽略)
+  return true;
+}
+
+void HeapIterator::skip_by_tranc_id() {
+  // TODO: Lab2.2 后续的Lab实现, 只是作为标记提醒
+}
+</code></pre>
+<h2 id="34-其他运算符重载函数"><a class="header" href="#34-其他运算符重载函数">3.4 其他运算符重载函数</a></h2>
+<p>其他运算符重载函数就简单了很多, 但仍然是对你代码理解的考验:</p>
+<pre><code class="language-cpp">HeapIterator::pointer HeapIterator::operator-&gt;() const {
+  // TODO: Lab2.2 实现 -&gt; 重载
+  return nullptr;
+}
+
+HeapIterator::value_type HeapIterator::operator*() const {
+  // TODO: Lab2.2 实现 * 重载
+  return {};
+}
+
+BaseIterator &amp;HeapIterator::operator++() {
+  // TODO: Lab2.2 实现 ++ 重载
+  return *this;
+}
+
+bool HeapIterator::operator==(const BaseIterator &amp;other) const {
+  // TODO: Lab2.2 实现 == 重载
+  return true;
+}
+
+bool HeapIterator::operator!=(const BaseIterator &amp;other) const {
+  // TODO: Lab2.2 实现 != 重载
+  return true;
+}
+</code></pre>
+<p>其中<code>-&gt;</code>运算符重载, 你可以直接利用已有的成员变量<code>mutable std::shared_ptr&lt;value_type&gt; current</code>, 返回器地址, 但你需要在构造函数和自增函数中对其进行正确的初始化和重置, 下面这个函数即为初始化和重置的逻辑实现:</p>
+<pre><code class="language-cpp">void HeapIterator::update_current() const {
+  // current 缓存了当前键值对的值, 你实现 -&gt; 重载时可能需要
+  // TODO: Lab2.2 更新当前缓存值
+}
+</code></pre>
+<h1 id="4-memtable的迭代器"><a class="header" href="#4-memtable的迭代器">4 MemTable的迭代器</a></h1>
+<p>接下来, 有了<code>HeapIterator</code>, 你可以实现<code>MemTable</code>组件的全局迭代器了:</p>
+<pre><code class="language-cpp">HeapIterator MemTable::begin(uint64_t tranc_id) {
+  // TODO Lab 2.2 MemTable 的迭代器
+  return {};
+}
+
+HeapIterator MemTable::end() {
+  // TODO Lab 2.2 MemTable 的迭代器
+  return HeapIterator{};
+}
+</code></pre>
+<p>这里的逻辑就是利用之前实现的<code>HeapIterator</code>对整个<code>MemTable</code>进行遍历。</p>
+<h1 id="5-测试"><a class="header" href="#5-测试">5 测试</a></h1>
+<p>当你完成上述所有功能后, 你可以通过如下测试:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_memtable
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from MemTableTest
+[ RUN      ] MemTableTest.BasicOperations
+[       OK ] MemTableTest.BasicOperations (0 ms)
+[ RUN      ] MemTableTest.RemoveOperations
+[       OK ] MemTableTest.RemoveOperations (0 ms)
+[ RUN      ] MemTableTest.FrozenTableOperations
+[       OK ] MemTableTest.FrozenTableOperations (0 ms)
+[ RUN      ] MemTableTest.LargeScaleOperations
+[       OK ] MemTableTest.LargeScaleOperations (0 ms)
+[ RUN      ] MemTableTest.MemorySizeTracking
+[       OK ] MemTableTest.MemorySizeTracking (0 ms)
+[ RUN      ] MemTableTest.MultipleFrozenTables
+[       OK ] MemTableTest.MultipleFrozenTables (0 ms)
+[ RUN      ] MemTableTest.IteratorComplexOperations
+[       OK ] MemTableTest.IteratorComplexOperations (0 ms)
+[ RUN      ] MemTableTest.ConcurrentOperations
+[       OK ] MemTableTest.ConcurrentOperations (601 ms)
+[ RUN      ] MemTableTest.PreffixIter
+[       OK ] MemTableTest.PreffixIter (0 ms)
+[----------] 9 tests from MemTableTest (602 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 1 test suite ran. (602 ms total)
+[  PASSED  ] 9 tests.
+</code></pre>
+<p>接下来你可以开启下一小节的<a href="./lab2.3-range-query.html">Lab</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lab2/lab2.1-memtabel-crud.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../lab2/lab2.3-range-query.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lab2/lab2.1-memtabel-crud.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../lab2/lab2.3-range-query.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

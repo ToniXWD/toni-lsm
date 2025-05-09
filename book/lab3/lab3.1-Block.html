@@ -1,0 +1,365 @@
+<!DOCTYPE HTML>
+<html lang="ch" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Lab 3.1 Block 实现 - toni-lsm-lab</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">toni-lsm-lab</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="1-准备工作"><a class="header" href="#1-准备工作">1 准备工作</a></h1>
+<p>老套路, 我们先理一下<code>Block</code>的数据结构, 看看头文件定义:</p>
+<pre><code class="language-cpp">// include/block/block.h
+class Block : public std::enable_shared_from_this&lt;Block&gt; {
+  friend BlockIterator;
+
+private:
+  std::vector&lt;uint8_t&gt; data; // 对应架构图的 Data
+  std::vector&lt;uint16_t&gt; offsets; // 对应架构图的 Offset
+  size_t capacity;
+
+  struct Entry {
+    std::string key;
+    std::string value;
+    uint64_t tranc_id;
+  };
+  // ...
+};
+</code></pre>
+<p>这里可能涉及C++的新特性:</p>
+<pre><code class="language-cpp">public std::enable_shared_from_this&lt;Block&gt;
+</code></pre>
+<p><code>std::enable_shared_from_this</code> 是 C++11 引入的一个标准库特性，它允许一个对象安全地创建指向自身的<code>std::shared_ptr</code>。这里先简单说明一下, 后续实现迭代器的时候就知道其作用了。</p>
+<p>这里主要对<code>data</code>和<code>offsets</code>这两个数据结构进行说明, 他们在构建阶段和读取阶段存在一定区别, 首先还是给出架构图:</p>
+<p><img src="../images/lab3/Block.png" alt="Block" /></p>
+<p><strong>构建阶段</strong>
+当我们从<code>Skiplist</code>拿到数据构建一个<code>SST</code>时, <code>SST</code>需要逐个构建<code>Block</code>, 这个<code>Block</code>在构建时步骤如下:</p>
+<ol>
+<li>逐个将编码的键值对(也就是<code>Entry</code>)写入<code>data</code>数组, 同时将每个<code>Entry</code>的偏移量记录在内存中的<code>offsets</code>数组中。</li>
+<li>当这个<code>Block</code>容量达到阈值时, <code>Block</code>构建完成, 你需要将<code>offsets</code>数组写入到<code>Block</code>的末尾。</li>
+<li>还需要再<code>Block</code>末尾写入一个<code>Entry Num</code>值, 用于标识这个<code>Block</code>中键值对的数量, 从而在解码时获取<code>Offset</code>的其实位置(因为每个<code>Entry Offset</code>大小是固定的整型值)</li>
+<li>当前<code>Block</code>构建完成, <code>SST</code>开始构建下一个<code>Block</code>。</li>
+</ol>
+<blockquote>
+<p>这里之所以将先将键值对持久化到<code>data</code>数组, 而元信息暂存于内存的<code>offsets</code>数组, 是因为<code>Data</code>是在数据部分之后的的<code>Offset</code>部分的偏移需要再键值对完全写入<code>Data</code>部分后才能确定</p>
+</blockquote>
+<p><strong>解码阶段</strong>
+解码阶段, 直接将<code>Data</code>、<code>Offset</code>解码形成内存中的<code>Block</code>的实例以为上层组件提供查询功能，同时如果实现了缓存池，需要再缓存池中进行记录。</p>
+<h1 id="2-代码实现"><a class="header" href="#2-代码实现">2 代码实现</a></h1>
+<p>你需要修改的函数都在<code>src/block/block.cpp</code>中。</p>
+<h2 id="21-block-编码和解码"><a class="header" href="#21-block-编码和解码">2.1 Block 编码和解码</a></h2>
+<p>这里你先不要管这个<code>Block</code>是哪里来的, 就当它已经存在, 实现编码和解码的功能:</p>
+<pre><code class="language-cpp">std::vector&lt;uint8_t&gt; Block::encode() {
+  // TODO Lab 3.1 编码单个类实例形成一段字节数组
+  return {};
+}
+
+std::shared_ptr&lt;Block&gt; Block::decode(const std::vector&lt;uint8_t&gt; &amp;encoded,
+                                     bool with_hash) {
+  // TODO Lab 3.1 解码字节数组形成类实例
+  return nullptr;
+}
+</code></pre>
+<p>这里特别说明, <code>encode</code>时的数据是不包括校验的哈希值的 因为哈希值是在<code>SST</code>控制<code>Block</code>构建过程中计算的, 但在<code>decode</code>时可以通过<code>with_hash</code>参数来指示传入的<code>encoded</code>是否包含哈希值, 如果包含哈希值, 则需要先校验哈希值是否正确, 校验失败则抛出异常。</p>
+<blockquote>
+<p>之所以<code>encode</code>不计算哈希值, <code>decode</code>按需计算哈希值, 其实是作者初版代码设计不佳, 这里先不纠结了, 后续可能会进行优化, 如果你有优化方案, 可对代码进行修改后提PR</p>
+</blockquote>
+<blockquote>
+<p>编解码时你需要注意数据的格式, 如果校验格式错误, 你需要抛出异常, 否则错误将非常难以<code>Debug</code></p>
+</blockquote>
+<h2 id="22-局部数据编解码函数"><a class="header" href="#22-局部数据编解码函数">2.2 局部数据编解码函数</a></h2>
+<p>对于二进制数据, 你需要按照设计的编码结构获取其<code>key</code>, <code>value</code>和<code>tranc_id</code>, 这里我们实现几个辅助函数:</p>
+<pre><code class="language-cpp">// 从指定偏移量获取entry的key
+std::string Block::get_key_at(size_t offset) const {
+  // TODO Lab 3.1 从指定偏移量获取entry的key
+  return "";
+}
+
+// 从指定偏移量获取entry的value
+std::string Block::get_value_at(size_t offset) const {
+  // TODO Lab 3.1 从指定偏移量获取entry的value
+  return "";
+}
+
+uint16_t Block::get_tranc_id_at(size_t offset) const {
+  // TODO Lab 3.1 从指定偏移量获取entry的tranc_id
+  // ? 你不需要理解tranc_id的具体含义, 直接返回即可
+  return 0;
+}
+</code></pre>
+<h2 id="23-构建-block"><a class="header" href="#23-构建-block">2.3 构建 Block</a></h2>
+<p><code>Block</code>构建是由<code>SST</code>控制的, 其会不断地调用下面这个函数添加键值对:</p>
+<pre><code class="language-cpp">bool Block::add_entry(const std::string &amp;key, const std::string &amp;value,
+                      uint64_t tranc_id, bool force_write) {
+  // TODO Lab 3.1 添加一个键值对到block中
+  // ? 返回值说明：
+  // ? true: 成功添加
+  // ? false: block已满, 拒绝此次添加
+  return false;
+}
+</code></pre>
+<p>这里需要注意, <code>force_write</code>参数表示是否强制写入, 如果为<code>true</code>, 则不管<code>Block</code>是否已满, 都强制写入, 否则如果<code>Block</code>已满, 则拒绝此次写入。</p>
+<p><code>Block</code>是否已满的判断将当前数据容量与成员变量<code>capacity</code>进行比较, <code>capacity</code>在<code>Block</code>初始化时由<code>SST</code>传入, 表示一个<code>Block</code>的最大容量。</p>
+<blockquote>
+<p>如果你需要一些使用<code>config.toml</code>中预定义的一些阈值变量或者其他常来那个, 你也可以通过<code>TomlConfig::getInstance().getXXX</code>的方式获取</p>
+</blockquote>
+<h2 id="24-二分查询"><a class="header" href="#24-二分查询">2.4 二分查询</a></h2>
+<p><code>Block</code>构建时是通过<code>SST</code>遍历<code>Skiplist</code>的迭代器调用<code>add_entry</code>实现的, 因此<code>Block</code>的数据是有序的, 你需要实现一个二分查找函数, 用于在<code>Block</code>中查找指定<code>key</code>所属的<code>Entry</code>在<code>offset</code>元数据中的索引:</p>
+<pre><code class="language-cpp">std::optional&lt;size_t&gt; Block::get_idx_binary(const std::string &amp;key,
+                                            uint64_t tranc_id) {
+  // TODO Lab 3.1 使用二分查找获取key对应的索引
+  return std::nullopt;
+}
+</code></pre>
+<p><code>get_value_binary</code>函数中会调用<code>get_idx_binary</code>函数, 并返回指定<code>key</code>的<code>value</code>:</p>
+<pre><code class="language-cpp">// 使用二分查找获取value
+// 要求在插入数据时有序插入
+std::optional&lt;std::string&gt; Block::get_value_binary(const std::string &amp;key,
+                                                   uint64_t tranc_id) {
+  auto idx = get_idx_binary(key, tranc_id);
+  if (!idx.has_value()) {
+    return std::nullopt;
+  }
+
+  return get_value_at(offsets[*idx]);
+}
+</code></pre>
+<h1 id="3-测试"><a class="header" href="#3-测试">3 测试</a></h1>
+<p>如果成功完成了上述的所有函数, 你应该如下运行测试并得到结果:</p>
+<pre><code class="language-bash">✗ xmake
+[100%]: build ok, spent 1.94s
+✗ xmake run test_block
+[==========] Running 10 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 10 tests from BlockTest
+[ RUN      ] BlockTest.DecodeTest
+[       OK ] BlockTest.DecodeTest (0 ms)
+[ RUN      ] BlockTest.EncodeTest
+[       OK ] BlockTest.EncodeTest (0 ms)
+[ RUN      ] BlockTest.BinarySearchTest
+[       OK ] BlockTest.BinarySearchTest (0 ms)
+[ RUN      ] BlockTest.EdgeCasesTest
+[       OK ] BlockTest.EdgeCasesTest (0 ms)
+[ RUN      ] BlockTest.LargeDataTest
+[       OK ] BlockTest.LargeDataTest (0 ms)
+[ RUN      ] BlockTest.ErrorHandlingTest
+[       OK ] BlockTest.ErrorHandlingTest (1 ms)
+[ RUN      ] BlockTest.IteratorTest
+test/test_block.cpp:225: Failure
+Expected equality of these values:
+  count
+    Which is: 0
+  test_data.size()
+    Which is: 100
+</code></pre>
+<p>你应该能通过<code>BlockTest.IteratorTest</code>之前的所有单元测试, <code>BlockTest.IteratorTest</code>这个测试会测试<code>Block</code>的迭代器功能, 因为<code>Block</code>的迭代器功能还没有实现, 所以会失败, 这是符合预期的。</p>
+<h1 id="4-下一步"><a class="header" href="#4-下一步">4 下一步</a></h1>
+<p>现在进入下一步前, 你可以先思考:</p>
+<ol>
+<li>如何实现<code>Block</code>的迭代器</li>
+<li>为什么我们需要让<code>Block</code>类继承<code>std::enable_shared_from_this&lt;Block&gt;</code>?</li>
+</ol>
+<p>带着这些疑问, 欢迎开启下一章</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lab3/Block.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../lab3/lab3.2-BlockIterator.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lab3/Block.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../lab3/lab3.2-BlockIterator.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
