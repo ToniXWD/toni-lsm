@@ -1845,7 +1845,200 @@ SSTBuilder::build(size_t sst_id, const std::string &amp;path,
 <p>这里涉及到文件IO的操作, 作者已经在<code>include/utils</code>中封装了一个文件IO管理类<code>FileObj</code>, 你需要阅读<code>include/utils/files.h</code>即<code>src/utils/files.cpp</code>来了解其使用方法</p>
 </blockquote>
 <h1 id="3-测试-4"><a class="header" href="#3-测试-4">3 测试</a></h1>
-<p>待更新...</p>
+<p>到目前位置, 我们只是实现了<code>SST</code>的构建工具类<code>SSTBuilder</code>, 但由于我们很没有实现<code>SST</code>的查询功能, 所以现在我们还无法通过查询接口验证我们<code>SST</code>构建的正确性, 因此单元测试需要完成后续<code>SST</code>相关<code>Lab</code>才能实现。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-36-sst-查询"><a class="header" href="#lab-36-sst-查询">Lab 3.6 SST 查询</a></h1>
+<h1 id="1-概述-5"><a class="header" href="#1-概述-5">1 概述</a></h1>
+<p>首先, 需要声明, 这一小节的实验容量稍大, 你将同时实现<code>SST</code>的基础查询功能和迭代器<code>SstIterator</code>。</p>
+<p>为什么需要这样设计呢？答案是因为，我们对组件的查询设计沿用了<code>STL</code>的迭代器风格，查询都是返回迭代器作为结果的。但我们的思路首先应该是实现<code>SST</code>本身, 后续再实现迭代器<code>SstIterator</code>。但<code>STL</code>风格的接口设计导致二者耦合了，因此，这里索性将二者同时实现了。</p>
+<h2 id="11-sst-的定义"><a class="header" href="#11-sst-的定义">1.1 SST 的定义</a></h2>
+<p>同样，我们先看<code>SST</code>的定义：</p>
+<pre><code class="language-cpp">class SST : public std::enable_shared_from_this&lt;SST&gt; {
+private:
+  FileObj file;
+  std::vector&lt;BlockMeta&gt; meta_entries;
+  uint32_t bloom_offset; // 暂时忽略
+  uint32_t meta_block_offset;
+  size_t sst_id;
+  std::string first_key;
+  std::string last_key;
+  std::shared_ptr&lt;BloomFilter&gt; bloom_filter; // 暂时忽略
+  std::shared_ptr&lt;BlockCache&gt; block_cache; // 暂时忽略
+  uint64_t min_tranc_id_ = UINT64_MAX; // 暂时忽略
+  uint64_t max_tranc_id_ = 0; // 暂时忽略
+  // ...
+};
+</code></pre>
+<p><code>SST</code>最关键的成员变量是<code>meta_entries</code>, 其本质上就是从硬盘中读取了<code>SST文件</code>的<code>Meta Section</code>部分解析后的<code>BlockMeta</code>数组。在接受外部查询请求时, 我们会根据<code>key</code>在<code>meta_entries</code>中查找对应的<code>BlockMeta</code>, 然后从硬盘中读取<code>Block</code>并解码得到内存中的<code>Block</code>, 最后再调用<code>Block</code>的查询接口完成查询。这里的<code>FileObj file</code>成员变量就是实现对应的<code>SST文件</code>的<code>IO</code>操作的类实例。</p>
+<blockquote>
+<p>当然, 如果你完成了后续<code>Lab</code>, 这里的逻辑存在一些不同:</p>
+<ol>
+<li>如果后续实现了缓存池, 就可以从缓存池中查询<code>Block</code>, 而不是从硬盘中读取。</li>
+<li>如果后续实现了<code>BloomFilter</code>, 那么在查询时, 首先会通过<code>BloomFilter</code>判断<code>key</code>是否有存在的可能, 如果不可能存在, 则直接返回<code>nullptr</code>, 否则继续调用查询接口完成查询。</li>
+</ol>
+</blockquote>
+<h2 id="12-sstiterator-的定义"><a class="header" href="#12-sstiterator-的定义">1.2 SstIterator 的定义</a></h2>
+<p>然后是<code>SstIterator</code>的定义:</p>
+<pre><code class="language-cpp">class SstIterator : public BaseIterator {
+  // friend xxx
+
+private:
+  std::shared_ptr&lt;SST&gt; m_sst;
+  size_t m_block_idx;
+  uint64_t max_tranc_id_;
+  std::shared_ptr&lt;BlockIterator&gt; m_block_it;
+  mutable std::optional&lt;value_type&gt; cached_value; // 缓存当前值
+  // ...
+};
+</code></pre>
+<p>要实现<code>SST</code>的迭代器, 需要记录当前的<code>Block</code>索引, <code>以及Block</code>中的<code>Entry</code>索引, 因此也需要原<code>SST</code>类的<code>this</code>指针, 之前已经介绍过<code>enable_shared_from_this</code>了, 不再赘述。</p>
+<p>这里使用<code>m_sst</code>, <code>m_block_idx</code>和<code>m_block_it</code>分别记录原始的<code>SST</code>类对象、当前<code>Block</code>在<code>SST</code>中的位置、当前迭代器在<code>Block</code>中的位置。<code>cached_value</code>仍然用做缓存值, 因为读取键值对涉及文件<code>IO</code>操作, 因此这里的<code>cached_value</code>就不仅仅是为了实现<code>-&gt;</code>的辅助成员变量了, 而是正儿八经的优化手段。</p>
+<p>本小节<code>Lab</code>中, 你需要修改的代码文件:</p>
+<ul>
+<li>实现<code>SST</code>需要修改的文件
+<ul>
+<li><code>src/sst/sst.cpp</code></li>
+<li><code>include/sst/sst.h</code> (Optional)</li>
+</ul>
+</li>
+<li>实现<code>SstIterator</code>需要修改的文件
+<ul>
+<li><code>src/sst/sst_iterator.cpp</code></li>
+<li><code>include/sst/sst_iterator.h</code> (Optional)</li>
+</ul>
+</li>
+</ul>
+<h1 id="2-sst-基础代码实现"><a class="header" href="#2-sst-基础代码实现">2 SST 基础代码实现</a></h1>
+<h2 id="21-打开-sst-文件"><a class="header" href="#21-打开-sst-文件">2.1 打开 SST 文件</a></h2>
+<p>你需要实现<code>SST：：open</code>函数:</p>
+<pre><code class="language-cpp">// 头文件中将其定义为静态函数
+std::shared_ptr&lt;SST&gt; SST::open(size_t sst_id, FileObj file,
+                               std::shared_ptr&lt;BlockCache&gt; block_cache) {
+  // TODO Lab 3.6 打开一个SST文件, 返回一个描述类
+
+  return nullptr;
+}
+</code></pre>
+<p>尽管我们的<code>SST</code>对数据的查询是惰性地从文件系统中进行读取, 但必要的元信息需要我们加载到内存中。<code>SST::open</code>的工就是将<code>SST文件</code>的元信息进行解码和加载，返回一个描述类<code>SST</code>， 你可以将<code>SST</code>看做是<code>SST</code>文件的操作句柄，或者是文件描述符。</p>
+<blockquote>
+<ol>
+<li>如果你后续<code>Lab</code>实现了布隆过滤器, 那么布隆过滤器的<code>bit</code>数组也需要加载到内存中</li>
+<li><code>block_cache</code>是缓存池的指针, 你现在不需要管它是哪里来的, 只需要对类的成员变量进行简单赋值即可</li>
+</ol>
+</blockquote>
+<h2 id="22-加载-block"><a class="header" href="#22-加载-block">2.2 加载 Block</a></h2>
+<p>在接受其他组件的查询请求后, <code>SST</code>会根据元信息定位请求的<code>key</code>可能位于哪一个<code>Block</code>(因为<code>BlockMeta</code>中存储了首尾的<code>key</code>), 接下来就是读取这个<code>Blcok</code>, 这就是你需要实现的<code>read_block</code>函数:</p>
+<pre><code class="language-cpp">std::shared_ptr&lt;Block&gt; SST::read_block(size_t block_idx) {
+  // TODO: Lab 3.6 根据 block 的 id 读取一个 `Block`
+  return nullptr;
+}
+</code></pre>
+<blockquote>
+<p>实现缓存池后, 你的代码逻辑应该是</p>
+<ol>
+<li>从缓存池获取<code>Block</code>, 如果缓存命中, 直接返回。</li>
+<li>缓存未命中才从文件系统中读取</li>
+<li>返回前别忘了更新缓存池</li>
+</ol>
+</blockquote>
+<h2 id="23-根据-key-查询-block"><a class="header" href="#23-根据-key-查询-block">2.3 根据 key 查询 Block</a></h2>
+<pre><code class="language-cpp">size_t SST::find_block_idx(const std::string &amp;key) {
+  // 先在布隆过滤器判断key是否存在
+  // TODO: Lab 3.6 二分查找
+  // ? 给定一个 `key`, 返回其所属的 `block` 的索引
+  // ? 如果没有找到包含该 `key` 的 Block，返回-1
+  return 0;
+}
+</code></pre>
+<p><code>find_block_idx</code>函数的目的是根据<code>key</code>在<code>meta_entries</code>中查找对应的<code>BlockMeta</code>, 返回<code>BlockMeta</code>在<code>meta_entries</code>中的索引。如果<code>key</code>不存在于<code>SST</code>中, 则返回<code>-1</code>。</p>
+<p>这里由于<code>Block</code>的数据是有序的, 因此你需要使用二分查找算法提速, 否者你的查询性能会非常差。</p>
+<h1 id="3-sstiterator-代码实现"><a class="header" href="#3-sstiterator-代码实现">3 SstIterator 代码实现</a></h1>
+<h2 id="31-sstiterator-定位函数"><a class="header" href="#31-sstiterator-定位函数">3.1 SstIterator 定位函数</a></h2>
+<p>你需要实现下面的迭代器定位函数:</p>
+<pre><code class="language-cpp">void SstIterator::seek_first() {
+  // TODO: Lab 3.6 将迭代器定位到第一个key
+}
+
+void SstIterator::seek(const std::string &amp;key) {
+  // TODO: Lab 3.6 将迭代器定位到指定key的位置
+}
+</code></pre>
+<blockquote>
+<p>Hint
+这里的逻辑也很简单, 就是先使用记录在<code>sst</code>中的<code>meta_entries</code>找到包含要查找的<code>key</code>的<code>Block</code>(<code>find_block_idx</code>), 从文件中读取这个<code>Block</code>(<code>read_block</code>), 然后再读取的<code>Block</code>中调用获取指定<code>key</code>的迭代器的构造函数, 通过<code>BlockIterator</code>实现在<code>Block</code>中的定位。</p>
+</blockquote>
+<p><code>SST</code>创建迭代器时, 会在构造函数中选择是否偏移到指定的<code>key</code>, 你可以查看<code>SstIterator</code>的构造函数, 看看他们是如何与不同组件和函数见衔接的。</p>
+<h2 id="32-运算符重载函数"><a class="header" href="#32-运算符重载函数">3.2 运算符重载函数</a></h2>
+<p>作为迭代器, 我们的惯例就行要实现下面几个运算符重载函数:</p>
+<pre><code class="language-cpp">BaseIterator &amp;SstIterator::operator++() {
+  // TODO: Lab 3.6 实现迭代器自增
+  return *this;
+}
+
+bool SstIterator::operator==(const BaseIterator &amp;other) const {
+  // TODO: Lab 3.6 实现迭代器比较
+  return false;
+}
+
+bool SstIterator::operator!=(const BaseIterator &amp;other) const {
+  // TODO: Lab 3.6 实现迭代器比较
+  return false;
+}
+
+SstIterator::value_type SstIterator::operator*() const {
+  // TODO: Lab 3.6 实现迭代器解引用
+  return {};
+}
+</code></pre>
+<h1 id="4-补全-sst"><a class="header" href="#4-补全-sst">4 补全 SST</a></h1>
+<p>在实现了<code>SstIterator</code>后, 你可以补全以<code>SST</code>中以<code>SstIterator</code>作为返回值的几个函数:</p>
+<pre><code class="language-cpp">SstIterator SST::get(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab 3.6 根据查询`key`返回一个迭代器
+  // ? 如果`key`不存在, 返回一个无效的迭代器即可
+  throw std::runtime_error("Not implemented");
+}
+
+SstIterator SST::begin(uint64_t tranc_id) {
+  // TODO: Lab 3.6 返回起始位置迭代器
+  throw std::runtime_error("Not implemented");
+}
+
+SstIterator SST::end() {
+  // TODO: Lab 3.6 返回终止位置迭代器
+  throw std::runtime_error("Not implemented");
+}
+</code></pre>
+<p>这几个函数都很简单, 因为具体的定位操作是在<code>SstIterator</code>内部完成的(虽然其反过来有调用了<code>SST</code>的<code>find_block_idx</code>等函数), 因此只需要调用<code>SstIterator</code>的构造函数即可。这里作为<code>Lab</code>的内容主要是为了让你对不同组件之间的交互有一个认真, 意思到这样一个设计思路: <strong>迭代器是连接不同组件的桥梁</strong>.</p>
+<h1 id="5-测试-2"><a class="header" href="#5-测试-2">5 测试</a></h1>
+<p>此次测试包含之前<a href="lab3/./lab3.5-SSTBuilder.html">Lab 3.5</a>的实现, 预期的结果是:</p>
+<pre><code class="language-bash">✗ xmake
+[100%]: build ok, spent 0.517s
+✗ xmake run test_sst
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from SSTTest
+[ RUN      ] SSTTest.BasicWriteAndRead
+[       OK ] SSTTest.BasicWriteAndRead (3 ms)
+[ RUN      ] SSTTest.BlockSplitting
+[       OK ] SSTTest.BlockSplitting (0 ms)
+[ RUN      ] SSTTest.KeySearch
+[       OK ] SSTTest.KeySearch (0 ms)
+[ RUN      ] SSTTest.Metadata
+[       OK ] SSTTest.Metadata (0 ms)
+[ RUN      ] SSTTest.EmptySST
+[       OK ] SSTTest.EmptySST (1 ms)
+[ RUN      ] SSTTest.ReopenSST
+[       OK ] SSTTest.ReopenSST (1 ms)
+[ RUN      ] SSTTest.LargeSST
+[       OK ] SSTTest.LargeSST (0 ms)
+[ RUN      ] SSTTest.LargeSSTPredicate
+[       OK ] SSTTest.LargeSSTPredicate (0 ms)
+[----------] 8 tests from SSTTest (9 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (9 ms total)
+[  PASSED  ] 8 tests.
+</code></pre>
+<p>如果仅仅是得到一个可以跑的<code>SST</code>, 那么现在你已经完成的<code>SST</code>的大部分功能了。</p>
 <div style="break-before: page; page-break-before: always;"></div><p>TODO</p>
 
                     </main>
