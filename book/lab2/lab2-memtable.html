@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
-<html lang="ch" class="light sidebar-visible" dir="ltr">
+<html lang="zh-CN" class="light sidebar-visible" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Lab 2 MemTable - toni-lsm-lab</title>
+        <title>Lab 2 MemTable - Toni-LSM-Lab</title>
 
 
         <!-- Custom HTML head -->
@@ -123,7 +123,7 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title">toni-lsm-lab</h1>
+                    <h1 class="menu-title">Toni-LSM-Lab</h1>
 
                     <div class="right-buttons">
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
@@ -160,6 +160,14 @@
                     <main>
                         <h1 id="lab-2-memtabele"><a class="header" href="#lab-2-memtabele">Lab 2 MemTabele</a></h1>
 <p>本<code>Lab</code>中, 你将基于之前实现的<code>Skiplist</code>, 将其组织成内存中负责存储键值对的组件<code>MemTable</code>。</p>
+<blockquote>
+<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
+<pre><code class="language-bash">git pull origin lab
+git checkout your_branch
+git merge lab
+</code></pre>
+<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
+</blockquote>
 <h2 id="1-memtable的构造原理"><a class="header" href="#1-memtable的构造原理">1 MemTable的构造原理</a></h2>
 <p>再次回顾我们的整体架构图：</p>
 <p><img src="../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>

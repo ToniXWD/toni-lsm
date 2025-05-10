@@ -3,8 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Page not found - Toni-LSM-Lab</title>
-        <base href="/">
+        <title>Lab 3.7 范围查询 - Toni-LSM-Lab</title>
 
 
         <!-- Custom HTML head -->
@@ -13,33 +12,33 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="favicon.svg">
-        <link rel="shortcut icon" href="favicon.png">
-        <link rel="stylesheet" href="css/variables.css">
-        <link rel="stylesheet" href="css/general.css">
-        <link rel="stylesheet" href="css/chrome.css">
-        <link rel="stylesheet" href="css/print.css" media="print">
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link rel="stylesheet" href="fonts/fonts.css">
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="highlight-css" href="highlight.css">
-        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
-        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "";
+            const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc.js"></script>
+        <script src="../toc.js"></script>
     </head>
     <body>
     <div id="body-container">
@@ -92,7 +91,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
             </noscript>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -127,7 +126,7 @@
                     <h1 class="menu-title">Toni-LSM-Lab</h1>
 
                     <div class="right-buttons">
-                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         <a href="https://github.com/ToniXWD/toni-lsm" title="Git repository" aria-label="Git repository">
@@ -159,14 +158,84 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="document-not-found-404"><a class="header" href="#document-not-found-404">Document not found (404)</a></h1>
-<p>This URL is invalid, sorry. Please use the navigation bar or search to continue.</p>
+                        <h1 id="lab-37-范围查询"><a class="header" href="#lab-37-范围查询">Lab 3.7 范围查询</a></h1>
+<h1 id="1-函数功能描述"><a class="header" href="#1-函数功能描述">1 函数功能描述</a></h1>
+<p>同样地，我们设计了<code>sst_iters_monotony_predicate</code>函数，用于范围一段连续的区间, 这个区间是单调的, 只会在整个<code>SST</code>中出现一次, 例如包含指定前缀的一段范围。</p>
+<p>不过这里我们将次函数定义为静态函数, 并放置于<code>src/sst/sst_iterator.cpp</code>中。因为我们之前进行了模块拆分， <code>SST</code>和<code>SstIterator</code>分别定义在了<code>src/sst/sst.cpp</code>和<code>src/sst/sst_iterator.cpp</code>中，而<code>sst_iters_monotony_predicate</code>函数需要同时访问<code>SST</code>和<code>SstIterator</code>，因此我们需要将<code>sst_iters_monotony_predicate</code>定义为静态函数, 并设定为以上两个类的友元函数.</p>
+<h1 id="2-代码实现"><a class="header" href="#2-代码实现">2 代码实现</a></h1>
+<p>你需要更改的文件:</p>
+<ul>
+<li><code>src/sst/sst_iterator.cpp</code></li>
+</ul>
+<p>你需要实现<code>sst_iters_monotony_predicate</code>函数:</p>
+<pre><code class="language-cpp">// predicate返回值:
+//   0: 谓词
+//   &gt;0: 不满足谓词, 需要向右移动
+//   &lt;0: 不满足谓词, 需要向左移动
+std::optional&lt;std::pair&lt;SstIterator, SstIterator&gt;&gt; sst_iters_monotony_predicate(
+    std::shared_ptr&lt;SST&gt; sst, uint64_t tranc_id,
+    std::function&lt;int(const std::string &amp;)&gt; predicate) {
+  // TODO: Lab 3.7 实现谓词查询功能
+  return {};
+}
+</code></pre>
+<blockquote>
+<p>Hint</p>
+<ul>
+<li>这里的实现思路肯定是调用子组件<code>Block</code>的<code>get_monotony_predicate_iters</code>接口实现范围查询, 但你需要考虑不同<code>Block</code>查询结果的拼接, 即查询的目标可能跨<code>Block</code>分布</li>
+<li><code>SST</code>中所有的<code>Block</code>都是有序的, 因此你在定位<code>Block</code>时, 也推荐使用类似二分查询的思路加快定位速度</li>
+<li><code>src/sst/sst_iterator.cpp</code>中的<code>sst_iters_monotony_predicate</code>已经被设定为了<code>SST</code>和<code>SstIterator</code>的友元函数, 因此你可以随意访问<code>SST</code>和<code>SstIterator</code>的成员变量和函数, 这样应该可以简化你的实现</li>
+</ul>
+</blockquote>
+<h1 id="3-测试--阶段2-结束"><a class="header" href="#3-测试--阶段2-结束">3 测试 &amp;&amp; 阶段2 结束</a></h1>
+<p>现在, 你应该可以完成<code>test_sst</code>的所有测例:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_sst
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from SSTTest
+[ RUN      ] SSTTest.BasicWriteAndRead
+[       OK ] SSTTest.BasicWriteAndRead (2 ms)
+[ RUN      ] SSTTest.BlockSplitting
+[       OK ] SSTTest.BlockSplitting (0 ms)
+[ RUN      ] SSTTest.KeySearch
+[       OK ] SSTTest.KeySearch (0 ms)
+[ RUN      ] SSTTest.Metadata
+[       OK ] SSTTest.Metadata (0 ms)
+[ RUN      ] SSTTest.EmptySST
+[       OK ] SSTTest.EmptySST (0 ms)
+[ RUN      ] SSTTest.ReopenSST
+[       OK ] SSTTest.ReopenSST (0 ms)
+[ RUN      ] SSTTest.LargeSST
+[       OK ] SSTTest.LargeSST (0 ms)
+[ RUN      ] SSTTest.LargeSSTPredicate
+[       OK ] SSTTest.LargeSSTPredicate (0 ms)
+[----------] 8 tests from SSTTest (6 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (6 ms total)
+[  PASSED  ] 8 tests.
+</code></pre>
+<h1 id="4-思考--下一步"><a class="header" href="#4-思考--下一步">4 思考 &amp;&amp; 下一步?</a></h1>
+<p>现在你已经实现了<code>SST</code>的基本特性, 而剩余的<code>SST</code>特性还包括:</p>
+<ul>
+<li>不同<code>Level</code>的<code>SST</code>的压缩合并</li>
+<li>缓存池和布隆过滤器的优化</li>
+<li>以<code>Level</code>层级为单位的迭代器(就是将一整个<code>Level</code>的多个<code>SST</code>组织成一个迭代器)</li>
+</ul>
+<p>以上这些内容, 你将在<a href="../lab4/lab4-LSM-Engine.html">Lab 4 LSM Engine</a>中实现。因为以上的组件需要上层组件的控制，例如我们的缓存池是全局共享而非单个<code>SST</code>独有的, 因此需要上层组件进行初始化和分配。</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../lab3/lab3.6-SST&amp;&amp;SstIterator.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
+                            <a rel="next prefetch" href="../lab4/lab4-LSM-Engine.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -174,7 +243,13 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../lab3/lab3.6-SST&amp;&amp;SstIterator.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
+                    <a rel="next prefetch" href="../lab4/lab4-LSM-Engine.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
@@ -187,13 +262,13 @@
         </script>
 
 
-        <script src="elasticlunr.min.js"></script>
-        <script src="mark.min.js"></script>
-        <script src="searcher.js"></script>
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
 
-        <script src="clipboard.min.js"></script>
-        <script src="highlight.js"></script>
-        <script src="book.js"></script>
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
 

@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
-<html lang="ch" class="light sidebar-visible" dir="ltr">
+<html lang="zh-CN" class="light sidebar-visible" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>toni-lsm-lab</title>
+        <title>Toni-LSM-Lab</title>
         <meta name="robots" content="noindex">
 
 
@@ -124,7 +124,7 @@
                         </button>
                     </div>
 
-                    <h1 class="menu-title">toni-lsm-lab</h1>
+                    <h1 class="menu-title">Toni-LSM-Lab</h1>
 
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -331,7 +331,8 @@
 <p><a href="https://www.usenix.org/system/files/conference/fast16/fast16-papers-lu.pdf">WiscKey: Separating Keys from Values in SSD-Conscious Storage</a>：分离 Key 和 Value，降低写放大</p>
 <p><a href="https://www.usenix.org/system/files/conference/fast16/fast16-papers-lu.pdf">Monkey: Optimal Bloom Filters and Tuning for LSM-Trees</a>：优化布隆过滤器分配策略，减少读放大</p>
 <p>这里不再进行详细介绍，感兴趣的可以阅读相关论文。</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-os和编译器环境"><a class="header" href="#1-os和编译器环境">1 OS和编译器环境</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-0-环境准备"><a class="header" href="#lab-0-环境准备">Lab 0 环境准备</a></h1>
+<h1 id="1-os和编译器环境"><a class="header" href="#1-os和编译器环境">1 OS和编译器环境</a></h1>
 <p>本实验目前最高使用的<code>C++</code>标准是<code>C++20</code>, 所以需要使用<code>g++</code>或者<code>clang++</code>进行编译, 因此只要是支持<code>C++20</code>的编译器都可以. 我这里使用的操作系统是<code>kali linux</code>, 其和<code>Ubuntu</code>一样, 都是基于<code>Debian</code>, 且都使用<code>apt</code>作为系统包管理工具, 所以你使用<code>Ubuntu</code>或者<code>Debian</code>执行我之后的安装指令肯定也没有什么问题。</p>
 <blockquote>
 <p>我使用<code>WSL2</code>的<code>kali linux</code>作为开发环境, <code>WSL2</code>相关内容可以参考<a href="https://zhuanlan.zhihu.com/p/682583573">WSL入门到入土</a>
@@ -478,7 +479,15 @@ xmake
 ├── utils/           # 工具函数与通用组件
 ├── wal/             # Write Ahead Log管理
 ```</code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-1-跳表"><a class="header" href="#lab-1-跳表">Lab 1 跳表</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-1-跳表实现"><a class="header" href="#lab-1-跳表实现">Lab 1 跳表实现</a></h1>
+<blockquote>
+<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
+<pre><code class="language-bash">git pull origin lab
+git checkout your_branch
+git merge lab
+</code></pre>
+<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
+</blockquote>
 <h2 id="1-跳表在-lsm-tree-中的作用"><a class="header" href="#1-跳表在-lsm-tree-中的作用">1 跳表在 LSM Tree 中的作用</a></h2>
 <p>本<code>Lab</code>中, 你将实现内存的基础数据结构作为<code>MemTable</code>的容器, 这里使用基于红黑树的<code>std::map</code>也是可行的, 但<code>LSM Tree</code>的原始论文中使用的是跳表, 因此我们选择使用跳表作为<code>MemTable</code>的容器，并且正好实现以下这个数据结构 (造轮子是<code>C++</code>的快乐)。</p>
 <p>我们再次回顾下面的这张架构图:</p>
@@ -527,7 +536,8 @@ xmake
 <li>上面演示的<code>SkipList</code>仅仅是单向链表, 如果是双向链表, 有什么区别呢?</li>
 </ol>
 <p>带着疑问, 你可以开启下一章<a href="lab1/lab2-skiplist-put.html">跳表 put/remove 的实现</a>的<code>Lab</code>实验了</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-准备工作"><a class="header" href="#1-准备工作">1 准备工作</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-11-跳表的-crud"><a class="header" href="#lab-11-跳表的-crud">Lab 1.1 跳表的 CRUD</a></h1>
+<h1 id="1-准备工作"><a class="header" href="#1-准备工作">1 准备工作</a></h1>
 <p>本<code>Lab</code>中, 你需要修改的代码文件为</p>
 <ul>
 <li><code>src/skiplist/skipList.cpp</code></li>
@@ -658,7 +668,8 @@ SkipListIterator SkipList::get(const std::string &amp;key, uint64_t tranc_id) {
 </code></pre>
 <p>到<code>SkipListTest.Iterator</code>前的单元测试你应该都能够通过, 卡在<code>SkipListTest.Iterator</code>是因为我们很没有实现迭代器相关功能。</p>
 <p>恭喜你, 你已经完成了<code>SkipList</code>的基础<code>CRUD</code>实现。接下来你可以进行<a href="lab1/./lab1.2-Iterator-query.html">Lab1.2</a>了。</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-概述"><a class="header" href="#1-概述">1 概述</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-12-迭代器"><a class="header" href="#lab-12-迭代器">Lab 1.2 迭代器</a></h1>
+<h1 id="1-概述"><a class="header" href="#1-概述">1 概述</a></h1>
 <p>这一部分的内容很简单, 只需要补全跳表迭代器即可。跳表的迭代器基本上就是对<code>SkiplistNode</code>的最简化封装, 这一小节的代码量非常少, 也很简单, 不过重点是迭代器的设计和基类的继承关系。</p>
 <p>我们先来看它继承了什么基类：</p>
 <pre><code class="language-cpp">class SkipListIterator : public BaseIterator
@@ -696,7 +707,8 @@ IteratorType SkipListIterator::get_type() const {
 <h1 id="3-测试"><a class="header" href="#3-测试">3 测试</a></h1>
 <p>现在你应该能通过<code>test/test_skiplist.cpp</code>中的<code>SkipListTest.Iterator</code>单元测试了</p>
 <p>没问题我们开始<code>Lab 1</code>的最后一部分: <a href="lab1/./lab1.3-range-query.html">Lab 1.3 范围查询</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-范围查询的特性"><a class="header" href="#1-范围查询的特性">1 范围查询的特性</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-13-范围查询"><a class="header" href="#lab-13-范围查询">Lab 1.3 范围查询</a></h1>
+<h1 id="1-范围查询的特性"><a class="header" href="#1-范围查询的特性">1 范围查询的特性</a></h1>
 <p>根据之前的介绍我们了解到, 我们实现的跳表是一个有序数据结构, 而我们构建的数据库是<code>K00V00</code>数据库, 因此除了最基础的<code>CRUD</code>操作外, 我们还需要实现一个范围查询的功能。这些范围查询包括:</p>
 <ol>
 <li>前缀查询: 通过前缀查询, 我们可以查询以某个前缀开头的所有键值对。比如, 我们数据库中如果<code>k00ey</code>用<code>userxxx</code>标识用户数据, 可以查询以<code>"userxx"</code>开头的所有用户数据的键值对。</li>
@@ -810,6 +822,14 @@ SkipList::iters_monotony_predicate(
 <p>到此为止, <code>Lab1</code>的实验结束, 恭喜你完成本实验!</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="lab-2-memtabele"><a class="header" href="#lab-2-memtabele">Lab 2 MemTabele</a></h1>
 <p>本<code>Lab</code>中, 你将基于之前实现的<code>Skiplist</code>, 将其组织成内存中负责存储键值对的组件<code>MemTable</code>。</p>
+<blockquote>
+<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
+<pre><code class="language-bash">git pull origin lab
+git checkout your_branch
+git merge lab
+</code></pre>
+<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
+</blockquote>
 <h2 id="1-memtable的构造原理"><a class="header" href="#1-memtable的构造原理">1 MemTable的构造原理</a></h2>
 <p>再次回顾我们的整体架构图：</p>
 <p><img src="lab2/../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
@@ -839,7 +859,8 @@ SkipList::iters_monotony_predicate(
 </li>
 </ol>
 <p>通过本节对<code>MemTable</code>的基本介绍, 以及进阶问题的思考, 你可以开始[Lab ]</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-准备工作-1"><a class="header" href="#1-准备工作-1">1 准备工作</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-21-简单-crud"><a class="header" href="#lab-21-简单-crud">Lab 2.1 简单 CRUD</a></h1>
+<h1 id="1-准备工作-1"><a class="header" href="#1-准备工作-1">1 准备工作</a></h1>
 <p>本小节需要你修改的代码：
 -<code>src/memtable/memtable.cpp</code></p>
 <ul>
@@ -973,7 +994,8 @@ void MemTable::frozen_cur_table() {
 </code></pre>
 <p><code>ConcurrentOperations</code>需要你实现后续的迭代器功能。</p>
 <p>接下来你可以开启下一小节的<a href="lab2/./lab2.2-iterator.html">Lab</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-迭代器的作用"><a class="header" href="#1-迭代器的作用">1 迭代器的作用</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-22-迭代器"><a class="header" href="#lab-22-迭代器">Lab 2.2 迭代器</a></h1>
+<h1 id="1-迭代器的作用"><a class="header" href="#1-迭代器的作用">1 迭代器的作用</a></h1>
 <p>我们需要实现整个<code>MemTable</code>的迭代器, 这算是本<code>Lab</code>的一个难点, 因为新的<code>SkipList</code>中的元素会导致旧的<code>SkipList</code>的部分元素失效, 因此不能简单地将不同<code>SkipList</code>的遍历结果拼接起来就完事儿。</p>
 <p>试想下面这个场景：</p>
 <pre><code class="language-bash">SkipList0: ("k1", "v1") -&gt; ("k4", "") -&gt; ("k5", "v3")
@@ -1184,7 +1206,8 @@ HeapIterator MemTable::end() {
 [  PASSED  ] 9 tests.
 </code></pre>
 <p>接下来你可以开启下一小节的<a href="lab2/./lab2.3-range-query.html">Lab</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-概述-1"><a class="header" href="#1-概述-1">1 概述</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-23-范围查询"><a class="header" href="#lab-23-范围查询">Lab 2.3 范围查询</a></h1>
+<h1 id="1-概述-1"><a class="header" href="#1-概述-1">1 概述</a></h1>
 <p>还记得我们对<code>Skiplist</code>实现了前缀查询和谓词查询吗, 他们本质上都是范围查询, 这一小节, 你将基于已有的<code>Skiplist</code>的前缀查询和谓词查询接口, 实现<code>MemTable</code>的谓词查询。</p>
 <p>本小节需要你修改的代码：
 -<code>src/memtable/memtable.cpp</code></p>
@@ -1253,7 +1276,8 @@ MemTable::iters_monotony_predicate(
 [  PASSED  ] 12 tests.
 </code></pre>
 <p>到此为止, <code>Lab2</code>的实验结束, 恭喜你完成本实验!</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-概述-2"><a class="header" href="#1-概述-2">1 概述</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-3-sst"><a class="header" href="#lab-3-sst">Lab 3 SST</a></h1>
+<h1 id="1-概述-2"><a class="header" href="#1-概述-2">1 概述</a></h1>
 <p>这一章的开头我们再次搬出我们的经典架构图:</p>
 <p><img src="lab3/../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
 <p>通过<a href="lab3/../lab1/lab1-skiplist.html">Lab1</a>和<a href="lab3/../lab2/lab2-memtable.html">Lab2</a>的学习，我们已经初步完成了<code>LSM Tree</code>中内存的基础读写组件, 这一章我们将眼光从内存迁移到磁盘, 实现<code>SST</code>相关的内容。</p>
@@ -1303,7 +1327,16 @@ MemTable::iters_monotony_predicate(
 <p>当你对上述问题有过简单思考后, 你可以开启本次<code>Lab</code>了, 你需要有一定心理准备, 这一大章节的<code>Lab</code>原比之前的<code>MemTable</code>和<code>Skiplist</code>复杂, 现在开始第一部分 <a href="lab3/./lab3.1-Block.html">Block 实现</a>。</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="阶段1-block"><a class="header" href="#阶段1-block">阶段1-Block</a></h1>
 <p>本阶段主要实现<code>Block</code>类, 包括<code>Block</code>的编码格式, 编解码方法、以及<code>Block</code>的迭代器和相关的查询功能。</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-准备工作-2"><a class="header" href="#1-准备工作-2">1 准备工作</a></h1>
+<blockquote>
+<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
+<pre><code class="language-bash">git pull origin lab
+git checkout your_branch
+git merge lab
+</code></pre>
+<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-31-block-实现"><a class="header" href="#lab-31-block-实现">Lab 3.1 Block 实现</a></h1>
+<h1 id="1-准备工作-2"><a class="header" href="#1-准备工作-2">1 准备工作</a></h1>
 <p>老套路, 我们先理一下<code>Block</code>的数据结构, 看看头文件定义:</p>
 <pre><code class="language-cpp">// include/block/block.h
 class Block : public std::enable_shared_from_this&lt;Block&gt; {
@@ -1456,7 +1489,8 @@ Expected equality of these values:
 <li>为什么我们需要让<code>Block</code>类继承<code>std::enable_shared_from_this&lt;Block&gt;</code>?</li>
 </ol>
 <p>带着这些疑问, 欢迎开启下一章</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="1-blockiterator的设计"><a class="header" href="#1-blockiterator的设计">1 BlockIterator的设计</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-32-迭代器"><a class="header" href="#lab-32-迭代器">Lab 3.2 迭代器</a></h1>
+<h1 id="1-blockiterator的设计"><a class="header" href="#1-blockiterator的设计">1 BlockIterator的设计</a></h1>
 <p>现在实现我们的<code>Block</code>的迭代器。通过<code>Block</code>的编码格式可知, 只需要知道当前的索引, 就可以在<code>Block</code>中查询该索引的<code>kv</code>对, 因此迭代器只需要记录当前索引和原始<code>Block</code>的引用就可以了。</p>
 <p>这也就是之前提到的<code>std::enable_shared_from_this</code>的作用，让我们的<code>BlockIterator</code>可以使用<code>Block</code>的智能指针, 为什么这样设计呢? 因为<code>BlockIterator</code>的生命周期是依赖于于<code>Block</code>的, 如果<code>Block</code>的生命周期结束, <code>BlockIterator</code>依然存在, 那么就会产生悬空指针, 因此我们需要使用智能指针来管理<code>Block</code>的生命周期。</p>
 <p>这么说可能有点迷糊, 我们直接看头文件定义:</p>
@@ -1585,7 +1619,7 @@ C++ exception with description "bad optional access" thrown in the test body.
 </code></pre>
 <p><code>PredicateTest</code>需要你在完成下一小节的任务后, 才能通过。</p>
 <p>现在你可以开启下一节的<a href="lab3/./lab3.3-iter-query.html">范围查询</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-32-基于迭代器的查询"><a class="header" href="#lab-32-基于迭代器的查询">Lab 3.2 基于迭代器的查询</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-33-范围查询"><a class="header" href="#lab-33-范围查询">Lab 3.3 范围查询</a></h1>
 <h1 id="1-范围查询函数"><a class="header" href="#1-范围查询函数">1 范围查询函数</a></h1>
 <p>鉴于你之前已经在<code>Skiplist</code>组件和<code>MemTable</code>组件中实现了<code>range_query</code>功能, 这里我们需要再<code>Blcok</code>组件中再次实现<code>range_query</code>功能。(同样, 查询是单调的), 只不过这里操作的基础数据从内存中的跳表变成了类似数组结构的<code>Block</code>。</p>
 <p>你需要修改的文件:</p>
@@ -1662,6 +1696,14 @@ Block::get_monotony_predicate_iters(
 <div style="break-before: page; page-break-before: always;"></div><h1 id="阶段2-sst"><a class="header" href="#阶段2-sst">阶段2-SST</a></h1>
 <p>在完成了<code>Block</code>组件和<code>BlockIterator</code>组件之后, 我们就可以开始实现<code>SST</code>组件了。</p>
 <p><code>SST</code>组件的核心工作就是管理器内部的多个<code>Block</code>组件, 利用<code>Block</code>组件和<code>BlockIterator</code>的各种<code>CRUD</code>和初始化、构建等基本接口，来对外提供各类功能。</p>
+<blockquote>
+<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
+<pre><code class="language-bash">git pull origin lab
+git checkout your_branch
+git merge lab
+</code></pre>
+<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="lab-34-blockmeta"><a class="header" href="#lab-34-blockmeta">Lab 3.4 BlockMeta</a></h1>
 <h1 id="1-概述-3"><a class="header" href="#1-概述-3">1 概述</a></h1>
 <p>让我们再次回顾<code>SST</code>的结构:</p>
@@ -2012,12 +2054,84 @@ SstIterator SST::end() {
 <p>此次测试包含之前<a href="lab3/./lab3.5-SSTBuilder.html">Lab 3.5</a>的实现, 预期的结果是:</p>
 <pre><code class="language-bash">✗ xmake
 [100%]: build ok, spent 0.517s
-✗ xmake run test_sst
+✗ xmake run test_sst  
 [==========] Running 8 tests from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 8 tests from SSTTest
 [ RUN      ] SSTTest.BasicWriteAndRead
 [       OK ] SSTTest.BasicWriteAndRead (3 ms)
+[ RUN      ] SSTTest.BlockSplitting
+[       OK ] SSTTest.BlockSplitting (1 ms)
+[ RUN      ] SSTTest.KeySearch
+[       OK ] SSTTest.KeySearch (0 ms)
+[ RUN      ] SSTTest.Metadata
+[       OK ] SSTTest.Metadata (0 ms)
+[ RUN      ] SSTTest.EmptySST
+[       OK ] SSTTest.EmptySST (0 ms)
+[ RUN      ] SSTTest.ReopenSST
+[       OK ] SSTTest.ReopenSST (0 ms)
+[ RUN      ] SSTTest.LargeSST
+[       OK ] SSTTest.LargeSST (0 ms)
+[ RUN      ] SSTTest.LargeSSTPredicate
+test/test_sst.cpp:235: Failure
+Value of: result.has_value()
+  Actual: false
+Expected: true
+
+unknown file: Failure
+C++ exception with description "bad optional access" thrown in the test body.
+
+[  FAILED  ] SSTTest.LargeSSTPredicate (1 ms)
+[----------] 8 tests from SSTTest (8 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (8 ms total)
+[  PASSED  ] 7 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] SSTTest.LargeSSTPredicate
+
+ 1 FAILED TEST
+error: execv(/home/toni/proj/toni-lsm/build/linux/x86_64/release/test_sst ) failed(1)
+</code></pre>
+<p>如果仅仅是得到一个可以跑的<code>SST</code>, 那么现在你已经完成的<code>SST</code>的大部分功能了。这里的<code>LargeSSTPredicate</code>需要你在实现下一小节的谓词查询后才能通过。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-37-范围查询"><a class="header" href="#lab-37-范围查询">Lab 3.7 范围查询</a></h1>
+<h1 id="1-函数功能描述"><a class="header" href="#1-函数功能描述">1 函数功能描述</a></h1>
+<p>同样地，我们设计了<code>sst_iters_monotony_predicate</code>函数，用于范围一段连续的区间, 这个区间是单调的, 只会在整个<code>SST</code>中出现一次, 例如包含指定前缀的一段范围。</p>
+<p>不过这里我们将次函数定义为静态函数, 并放置于<code>src/sst/sst_iterator.cpp</code>中。因为我们之前进行了模块拆分， <code>SST</code>和<code>SstIterator</code>分别定义在了<code>src/sst/sst.cpp</code>和<code>src/sst/sst_iterator.cpp</code>中，而<code>sst_iters_monotony_predicate</code>函数需要同时访问<code>SST</code>和<code>SstIterator</code>，因此我们需要将<code>sst_iters_monotony_predicate</code>定义为静态函数, 并设定为以上两个类的友元函数.</p>
+<h1 id="2-代码实现-3"><a class="header" href="#2-代码实现-3">2 代码实现</a></h1>
+<p>你需要更改的文件:</p>
+<ul>
+<li><code>src/sst/sst_iterator.cpp</code></li>
+</ul>
+<p>你需要实现<code>sst_iters_monotony_predicate</code>函数:</p>
+<pre><code class="language-cpp">// predicate返回值:
+//   0: 谓词
+//   &gt;0: 不满足谓词, 需要向右移动
+//   &lt;0: 不满足谓词, 需要向左移动
+std::optional&lt;std::pair&lt;SstIterator, SstIterator&gt;&gt; sst_iters_monotony_predicate(
+    std::shared_ptr&lt;SST&gt; sst, uint64_t tranc_id,
+    std::function&lt;int(const std::string &amp;)&gt; predicate) {
+  // TODO: Lab 3.7 实现谓词查询功能
+  return {};
+}
+</code></pre>
+<blockquote>
+<p>Hint</p>
+<ul>
+<li>这里的实现思路肯定是调用子组件<code>Block</code>的<code>get_monotony_predicate_iters</code>接口实现范围查询, 但你需要考虑不同<code>Block</code>查询结果的拼接, 即查询的目标可能跨<code>Block</code>分布</li>
+<li><code>SST</code>中所有的<code>Block</code>都是有序的, 因此你在定位<code>Block</code>时, 也推荐使用类似二分查询的思路加快定位速度</li>
+<li><code>src/sst/sst_iterator.cpp</code>中的<code>sst_iters_monotony_predicate</code>已经被设定为了<code>SST</code>和<code>SstIterator</code>的友元函数, 因此你可以随意访问<code>SST</code>和<code>SstIterator</code>的成员变量和函数, 这样应该可以简化你的实现</li>
+</ul>
+</blockquote>
+<h1 id="3-测试--阶段2-结束"><a class="header" href="#3-测试--阶段2-结束">3 测试 &amp;&amp; 阶段2 结束</a></h1>
+<p>现在, 你应该可以完成<code>test_sst</code>的所有测例:</p>
+<pre><code class="language-bash">✗ xmake
+✗ xmake run test_sst
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from SSTTest
+[ RUN      ] SSTTest.BasicWriteAndRead
+[       OK ] SSTTest.BasicWriteAndRead (2 ms)
 [ RUN      ] SSTTest.BlockSplitting
 [       OK ] SSTTest.BlockSplitting (0 ms)
 [ RUN      ] SSTTest.KeySearch
@@ -2025,20 +2139,66 @@ SstIterator SST::end() {
 [ RUN      ] SSTTest.Metadata
 [       OK ] SSTTest.Metadata (0 ms)
 [ RUN      ] SSTTest.EmptySST
-[       OK ] SSTTest.EmptySST (1 ms)
+[       OK ] SSTTest.EmptySST (0 ms)
 [ RUN      ] SSTTest.ReopenSST
-[       OK ] SSTTest.ReopenSST (1 ms)
+[       OK ] SSTTest.ReopenSST (0 ms)
 [ RUN      ] SSTTest.LargeSST
 [       OK ] SSTTest.LargeSST (0 ms)
 [ RUN      ] SSTTest.LargeSSTPredicate
 [       OK ] SSTTest.LargeSSTPredicate (0 ms)
-[----------] 8 tests from SSTTest (9 ms total)
+[----------] 8 tests from SSTTest (6 ms total)
 
 [----------] Global test environment tear-down
-[==========] 8 tests from 1 test suite ran. (9 ms total)
+[==========] 8 tests from 1 test suite ran. (6 ms total)
 [  PASSED  ] 8 tests.
 </code></pre>
-<p>如果仅仅是得到一个可以跑的<code>SST</code>, 那么现在你已经完成的<code>SST</code>的大部分功能了。</p>
+<h1 id="4-思考--下一步"><a class="header" href="#4-思考--下一步">4 思考 &amp;&amp; 下一步?</a></h1>
+<p>现在你已经实现了<code>SST</code>的基本特性, 而剩余的<code>SST</code>特性还包括:</p>
+<ul>
+<li>不同<code>Level</code>的<code>SST</code>的压缩合并</li>
+<li>缓存池和布隆过滤器的优化</li>
+<li>以<code>Level</code>层级为单位的迭代器(就是将一整个<code>Level</code>的多个<code>SST</code>组织成一个迭代器)</li>
+</ul>
+<p>以上这些内容, 你将在<a href="lab3/../lab4/lab4-LSM-Engine.html">Lab 4 LSM Engine</a>中实现。因为以上的组件需要上层组件的控制，例如我们的缓存池是全局共享而非单个<code>SST</code>独有的, 因此需要上层组件进行初始化和分配。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-4-lsm-engine"><a class="header" href="#lab-4-lsm-engine">Lab 4 LSM Engine</a></h1>
+<p>本章<code>Lab</code>将串联之前实现的<code>MemTable</code>, <code>SST</code>, <code>Block</code>, 各类<code>Iterator</code>, 实现一个初版的完整的单机<code>KV</code>存储引擎。</p>
+<blockquote>
+<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
+<pre><code class="language-bash">git pull origin lab
+git checkout your_branch
+git merge lab
+</code></pre>
+<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
+</blockquote>
+<h1 id="1-概述-6"><a class="header" href="#1-概述-6">1 概述</a></h1>
+<p>实现了之前的<code>Skiplist</code>, <code>MemTable</code>, <code>SST</code>, <code>Block</code>, 各类<code>Iterator</code>之后, 我们对其进行"简单"地封装, 即可得到一份可以运行的<code>LSM Engine</code>。完成这一章<code>Lab</code>后, 你将得到一个可以被外部结构调用的共享链接库, 其暴露了各种基础的<code>KV</code>存储引擎接口。</p>
+<p>同样地, 我们再一次回顾我们的架构:</p>
+<p><img src="lab4/../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
+<p>可以看到, 不同组件之间存在各种交互, 这些交互内容包括:</p>
+<ol>
+<li><code>MemTable</code>和<code>SST</code>之间进行<code>Encoded</code>并刷盘形成<code>SST文件</code></li>
+<li>不同<code>SST</code>之间的连接(例如遍历这一层的<code>SST</code>的键值对)</li>
+<li>相邻<code>Level</code>之间<code>SST</code>的<code>Compact</code>操作</li>
+<li><code>Client</code>发出<code>Get</code>请求到<code>MemTable</code>和<code>SST</code>组件的查询路径</li>
+</ol>
+<p>这一章的<code>Lab</code>就是将我们之前已经实现的组件进行串联, 形成初版的<code>LSM Tree</code>存储引擎。</p>
+<h1 id="2-思考"><a class="header" href="#2-思考">2 思考</a></h1>
+<p>同样地, 请先思考下面几个问题, 然后带着问题开始本章的<code>Lab</code>:</p>
+<ol>
+<li>不同组件之间交互的媒介是什么? 是迭代器吗?</li>
+<li>之前提到的布隆过滤器和缓存池的优化并未在架构图中给出, 他们位于哪个位置?</li>
+<li>缓存池缓存的是<code>Blcok</code>, 但如果<code>SST</code>被压缩形成新的<code>SST</code>文件, 缓存池中的<code>Block</code>将不再有效, 缓存池中的无效的<code>Block</code>将如何处理?</li>
+<li>不同<code>Level</code>的<code>SST Compact</code>采用什么策略? 他们对<code>Read/Write</code>性能有什么影响?</li>
+<li>我们实现整个<code>LSM Engine</code>的范围查询等操作时, 去重和排序逻辑和之前的组件有什么区别?</li>
+<li>为什么<code>Level 0</code>要设计成<code>Unsorted</code>? 所有的<code>Level</code>的<code>SST</code>都是<code>Sorted</code>不好吗?</li>
+<li>不同组件交互过程中, 如何设计并发控制策略, 保证其性能?</li>
+<li>实现上述的功能, 是不是又要设计新的迭代器?</li>
+</ol>
+<blockquote>
+<p>这些问题你不一定要马上给出一个清晰的答案, 只需要有一个整体的认知和思考即可, 这样有助于你对整个项目代码设计思路的理解。</p>
+<p>由于本实现的设计目的就是让更广大的开发者或CS专业的学生对<code>KV</code>存储有初步的认真, 因此难度是被刻意降低了的, 你不需要进行架构设计层面的思考以及对应代码的编写, 只需要补全作者挖空的关键函数。</p>
+<p>因此，如果你一味地完成<code>Lab</code>的代码, 却缺乏对作者给出思考题的理解, 那么你对本实验项目的理解可能是不到位的, 即你知道这么设计的代码能正常运行, 但却不知道他为什么这么设计。</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div><p>TODO</p>
 
                     </main>
