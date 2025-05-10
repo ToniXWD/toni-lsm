@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Lab 4 LSM Engine - Toni-LSM-Lab</title>
+        <title>Lab 4.2 Engine 的读取 - Toni-LSM-Lab</title>
 
 
         <!-- Custom HTML head -->
@@ -158,55 +158,132 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="lab-4-lsm-engine"><a class="header" href="#lab-4-lsm-engine">Lab 4 LSM Engine</a></h1>
-<p>本章<code>Lab</code>将串联之前实现的<code>MemTable</code>, <code>SST</code>, <code>Block</code>, 各类<code>Iterator</code>, 实现一个初版的完整的单机<code>KV</code>存储引擎。</p>
-<blockquote>
-<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
-<pre><code class="language-bash">git pull origin lab
-git checkout your_branch
-git merge lab
-</code></pre>
-<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
-</blockquote>
+                        <h1 id="lab-42-engine-的读取"><a class="header" href="#lab-42-engine-的读取">Lab 4.2 Engine 的读取</a></h1>
 <h1 id="1-概述"><a class="header" href="#1-概述">1 概述</a></h1>
-<p>实现了之前的<code>Skiplist</code>, <code>MemTable</code>, <code>SST</code>, <code>Block</code>, 各类<code>Iterator</code>之后, 我们对其进行"简单"地封装, 即可得到一份可以运行的<code>LSM Engine</code>。完成这一章<code>Lab</code>后, 你将得到一个可以被外部结构调用的共享链接库, 其暴露了各种基础的<code>KV</code>存储引擎接口。</p>
-<p>同样地, 我们再一次回顾我们的架构:</p>
-<p><img src="../images/intro/toni-lsm-arch.drawio.png" alt="Fig 1" /></p>
-<p>可以看到, 不同组件之间存在各种交互, 这些交互内容包括:</p>
+<p>从之前 <a href="./lab4.1-Engine-write.html">Lab 4.1 Engine 的写入</a>中, 我们已经实现了<code>SST</code>的构建流程, 这一章我们将实现<code>Engine</code>的读取流程。(这里的读取还包括引擎的初始化流程中对<code>SST文件</code>的读取)</p>
+<p>同样地, 我们想从逻辑上梳理引擎的读取和查询流程:</p>
+<p><strong>1 存储引擎启动时</strong></p>
+<p>遍历<code>data_dir</code>下的<code>SST</code>文件, 将<code>SST</code>文件的元信息加载到内存中</p>
+<p><strong>2 接受查询请求</strong></p>
 <ol>
-<li><code>MemTable</code>和<code>SST</code>之间进行<code>Encoded</code>并刷盘形成<code>SST文件</code></li>
-<li>不同<code>SST</code>之间的连接(例如遍历这一层的<code>SST</code>的键值对)</li>
-<li>相邻<code>Level</code>之间<code>SST</code>的<code>Compact</code>操作</li>
-<li><code>Client</code>发出<code>Get</code>请求到<code>MemTable</code>和<code>SST</code>组件的查询路径</li>
+<li>查询当前活跃的<code>MemTable</code>, 如果查到有效记录或删除记录, 则返回</li>
+<li>若查询当前活跃的<code>MemTable</code>未命中, 则遍历冻结的<code>MemTable</code>, 由于冻结的<code>MemTable</code>也存在次序, 需要先查询最近冻结的<code>MemTable</code></li>
+<li>若查询冻结的<code>MemTable</code>未命中, 则遍历<code>SST</code>, 由于<code>SST</code>也存在次序, 需要先查询最近创建的<code>SST</code>
+<ol>
+<li><code>SST</code>的顺序先按照<code>Level</code>排序, <code>Level</code>越低的<code>SST</code>越新, 需要先查询</li>
+<li>相同<code>Level</code>的<code>SST</code>按照<code>sst_id</code>排序, 这里的逻辑有所不同:
+<ol>
+<li>如果是<code>Level 0</code>的<code>SST</code>, 则按照<code>sst_id</code>排序, 从大到小查询, 越大的<code>sst_id</code>表示这个<code>SST</code>越新, 需要有限查询</li>
+<li>如果是其他<code>Level</code>以上的<code>SST</code>, 其所有的<code>SST</code>的<code>key</code>都是有序分布且不重叠的, 既然<code>key</code>不重叠也就无所谓谁的优先级更高、谁会覆盖谁的<code>key</code>, 可以采用二分查询实现更高的效率, 下面是一个<code>SST文件</code>的案例:
+<pre><code class="language-bash">Level 0: sst_15(key000-key050), sst_14(key005-key030), sst_13(key020-key040)
+Level 1: sst_10(key100-key120), sst_11(key121-key140), sst_12(key141-key160)
+Level 2: sst_08(key100-key120), sst_09(key121-key140)
+</code></pre>
+</li>
 </ol>
-<p>这一章的<code>Lab</code>就是将我们之前已经实现的组件进行串联, 形成初版的<code>LSM Tree</code>存储引擎。</p>
-<h1 id="2-思考"><a class="header" href="#2-思考">2 思考</a></h1>
-<p>同样地, 请先思考下面几个问题, 然后带着问题开始本章的<code>Lab</code>:</p>
-<ol>
-<li>不同组件之间交互的媒介是什么? 是迭代器吗?</li>
-<li>之前提到的布隆过滤器和缓存池的优化并未在架构图中给出, 他们位于哪个位置?</li>
-<li>缓存池缓存的是<code>Blcok</code>, 但如果<code>SST</code>被压缩形成新的<code>SST</code>文件, 缓存池中的<code>Block</code>将不再有效, 缓存池中的无效的<code>Block</code>将如何处理?</li>
-<li>不同<code>Level</code>的<code>SST Compact</code>采用什么策略? 他们对<code>Read/Write</code>性能有什么影响?</li>
-<li>我们实现整个<code>LSM Engine</code>的范围查询等操作时, 去重和排序逻辑和之前的组件有什么区别?</li>
-<li>为什么<code>Level 0</code>要设计成<code>Unsorted</code>? 所有的<code>Level</code>的<code>SST</code>都是<code>Sorted</code>不好吗?</li>
-<li>不同组件交互过程中, 如何设计并发控制策略, 保证其性能?</li>
-<li>实现上述的功能, 是不是又要设计新的迭代器?</li>
+</li>
+</ol>
+</li>
+<li>整个<code>SST</code>文件遍历完成后, 若仍未命中, 则返回空指针表示<code>key</code>没有找到</li>
 </ol>
 <blockquote>
-<p>这些问题你不一定要马上给出一个清晰的答案, 只需要有一个整体的认知和思考即可, 这样有助于你对整个项目代码设计思路的理解。</p>
-<p>由于本实现的设计目的就是让更广大的开发者或CS专业的学生对<code>KV</code>存储有初步的认真, 因此难度是被刻意降低了的, 你不需要进行架构设计层面的思考以及对应代码的编写, 只需要补全作者挖空的关键函数。</p>
-<p>因此，如果你一味地完成<code>Lab</code>的代码, 却缺乏对作者给出思考题的理解, 那么你对本实验项目的理解可能是不到位的, 即你知道这么设计的代码能正常运行, 但却不知道他为什么这么设计。</p>
+<p><strong>补充</strong></p>
+<ul>
+<li>在后续实现<code>WAL</code>后, 在上述所有流程前, 会有一个对<code>WAL</code>日志进行检查并实现崩溃恢复的流程</li>
+</ul>
 </blockquote>
+<h1 id="2-代码实现"><a class="header" href="#2-代码实现">2 代码实现</a></h1>
+<p>本小节你需要更改的代码文件为:</p>
+<ul>
+<li><code>src/lsm/engine.cpp</code></li>
+<li><code>include/lsm/engine.h</code></li>
+</ul>
+<h2 id="21-引擎的初始化"><a class="header" href="#21-引擎的初始化">2.1 引擎的初始化</a></h2>
+<p>上一章<a href="./lab4.1-Engine-write.html">Lab 4.1 Engine 的写入</a>中, 我们在<code>put</code>操作中惰性触发了<code>SST</code>的刷盘操作, 因此在<code>Engine</code>启动时, 我们需要遍历<code>data_dir</code>下的<code>SST</code>文件, 将<code>SST</code>文件的元信息加载到内存中, 以便后续的查询操作:</p>
+<pre><code class="language-cpp">LSMEngine::LSMEngine(std::string path) : data_dir(path) {
+  // 初始化日志
+  init_spdlog_file();
+
+  // TODO: Lab 4.2 引擎初始化
+}
+</code></pre>
+<p><strong>说明</strong></p>
+<ol>
+<li>后续实现缓存池后, 构造函数中需要对缓存池进行初始化, 现阶段你的构造函数, 只需要将<code>block_cache</code>初始化为<code>nullptr</code>即可</li>
+<li>第一次启动引擎时, 需要创建数据目录</li>
+<li><code>init_spdlog_file</code>函数用于初始化日志, 其内部是对<code>std::call_once</code>的封装, 因此其只有第一次调用时会执行</li>
+</ol>
+<blockquote>
+<p><strong>Hint</strong></p>
+<ol>
+<li>你需要从<code>SST文件</code>的命名格式中对<code>next_sst_id</code>和<code>cur_max_level</code>进行更新</li>
+<li><code>level_sst_ids</code>映射的数组需要你自己维护其优先级顺序, 不同<code>Level</code>的<code>SST</code>文件优先级可能不同, 现在你不需要关心<code>Level 0</code>以外的<code>SST</code></li>
+</ol>
+</blockquote>
+<h2 id="22-查询接口"><a class="header" href="#22-查询接口">2.2 查询接口</a></h2>
+<h3 id="221-get"><a class="header" href="#221-get">2.2.1 get</a></h3>
+<pre><code class="language-cpp">std::optional&lt;std::pair&lt;std::string, uint64_t&gt;&gt;
+LSMEngine::get(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab 4.2 查询
+
+  return std::nullopt;
+}
+</code></pre>
+<p>这里传入的<code>uint64_t tranc_id</code>是为了在实现事务功能后控制不同事务的可见性的, 也就是实现事务基础属性中的<strong>隔离性</strong>, 现阶段你可以忽略它</p>
+<p>此外, 这里的返回值是一个由<code>optional</code>包裹的<code>pair</code>, <code>pair</code>的第一个元素是<code>value</code>, 第二个元素是<code>tranc_id</code>, <code>value</code>表示查询到的值, <code>tranc_id</code>表示这个键值对最新的修改事务的的<code>tranc_id</code>(现阶段同样可以忽略), 如果查询不到, 则返回<code>std::nullopt</code></p>
+<h3 id="222-get_batch"><a class="header" href="#222-get_batch">2.2.2 get_batch</a></h3>
+<pre><code class="language-cpp">std::vector&lt;
+    std::pair&lt;std::string, std::optional&lt;std::pair&lt;std::string, uint64_t&gt;&gt;&gt;&gt;
+LSMEngine::get_batch(const std::vector&lt;std::string&gt; &amp;keys, uint64_t tranc_id) {
+  // TODO: Lab 4.2 批量查询
+
+  return {};
+}
+</code></pre>
+<p>没啥好说的, 就是在<code>get</code>的基础上变成了批量查询</p>
+<h3 id="223-sst_get_"><a class="header" href="#223-sst_get_">2.2.3 sst_get_</a></h3>
+<p>通过后缀你可以看出, 这个查询是专门在<code>SST</code>中进行查询的接口, 其<code>_</code>表示这个函数是不需要进行加锁操作的, 其加锁逻辑是其他上层组件控制的:</p>
+<pre><code class="language-cpp">std::optional&lt;std::pair&lt;std::string, uint64_t&gt;&gt;
+LSMEngine::sst_get_(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab 4.2 sst 内部查询
+  return std::nullopt;
+}
+</code></pre>
+<blockquote>
+<p>思考: 什么情况下会单独对<code>SST</code>部分进行查询?</p>
+</blockquote>
+<h1 id="3-测试"><a class="header" href="#3-测试">3 测试</a></h1>
+<p>完成<a href="./lab4.1-Engine-write.html">Lab 4.1 Engine 的写入</a>和本节<code>Lab</code>后, 你应该能通过<code>test/test_lsm.cpp</code>中<code>IteratorOperations</code>前的所有单元测试:</p>
+<pre><code class="language-bash">✗ xmake
+[100%]: build ok, spent 1.936s
+✗ xmake run test_lsm
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from LSMTest
+[ RUN      ] LSMTest.BasicOperations
+[       OK ] LSMTest.BasicOperations (0 ms)
+[ RUN      ] LSMTest.Persistence
+[       OK ] LSMTest.Persistence (228 ms)
+[ RUN      ] LSMTest.LargeScaleOperations
+[       OK ] LSMTest.LargeScaleOperations (1 ms)
+[ RUN      ] LSMTest.MixedOperations
+[       OK ] LSMTest.MixedOperations (0 ms)
+[ RUN      ] LSMTest.IteratorOperations
+unknown file: Failure
+C++ exception with description "Not implemented" thrown in the test body.
+
+[  FAILED  ] LSMTest.IteratorOperations (0 ms)
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../lab3/lab3.7-SST-Query.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../lab4/lab4.1-Engine-write.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../lab4/Engine-Base.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../lab4/Iter-Compact.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -216,11 +293,11 @@ git merge lab
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../lab3/lab3.7-SST-Query.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../lab4/lab4.1-Engine-write.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../lab4/Engine-Base.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../lab4/Iter-Compact.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

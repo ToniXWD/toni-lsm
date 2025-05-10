@@ -199,8 +199,7 @@ SkipList1 (id=1): ("k2", "v2") -&gt; ("k3", "v3") -&gt; ("k4", "v4")
 <li><code>include/memtable/memtable.h</code> (Optional)</li>
 </ul>
 <p>首先是<code>SearchItem</code>, 我们来看定义:</p>
-<pre><code class="language-cpp">class SstIterator;
-// *************************** SearchItem ***************************
+<pre><code class="language-cpp">// *************************** SearchItem ***************************
 struct SearchItem {
   std::string key_;
   std::string value_;
@@ -221,8 +220,6 @@ bool operator==(const SearchItem &amp;a, const SearchItem &amp;b);
 <p>其就是我们之前提到的每个堆节点的数据结构, 这里的构造函数中, <code>k, v, i</code>即为<code>key</code>, <code>value</code>, <code>id</code>(跳表的), <code>l</code>表示来源的层级, 现在我们都是在内存操作, 设为<code>0</code>即可, <code>tranc_id</code>不需要你理解, 直接赋值即可。</p>
 <p>然后是你要实现的迭代器<code>HeapIterator</code>的定义:</p>
 <pre><code class="language-cpp">class HeapIterator : public BaseIterator {
-  friend class SstIterator;
-
 public:
   HeapIterator() = default;
   HeapIterator(std::vector&lt;SearchItem&gt; item_vec, uint64_t max_tranc_id);

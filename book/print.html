@@ -1035,8 +1035,7 @@ SkipList1 (id=1): ("k2", "v2") -&gt; ("k3", "v3") -&gt; ("k4", "v4")
 <li><code>include/memtable/memtable.h</code> (Optional)</li>
 </ul>
 <p>首先是<code>SearchItem</code>, 我们来看定义:</p>
-<pre><code class="language-cpp">class SstIterator;
-// *************************** SearchItem ***************************
+<pre><code class="language-cpp">// *************************** SearchItem ***************************
 struct SearchItem {
   std::string key_;
   std::string value_;
@@ -1057,8 +1056,6 @@ bool operator==(const SearchItem &amp;a, const SearchItem &amp;b);
 <p>其就是我们之前提到的每个堆节点的数据结构, 这里的构造函数中, <code>k, v, i</code>即为<code>key</code>, <code>value</code>, <code>id</code>(跳表的), <code>l</code>表示来源的层级, 现在我们都是在内存操作, 设为<code>0</code>即可, <code>tranc_id</code>不需要你理解, 直接赋值即可。</p>
 <p>然后是你要实现的迭代器<code>HeapIterator</code>的定义:</p>
 <pre><code class="language-cpp">class HeapIterator : public BaseIterator {
-  friend class SstIterator;
-
 public:
   HeapIterator() = default;
   HeapIterator(std::vector&lt;SearchItem&gt; item_vec, uint64_t max_tranc_id);
@@ -2199,6 +2196,453 @@ git merge lab
 <p>由于本实现的设计目的就是让更广大的开发者或CS专业的学生对<code>KV</code>存储有初步的认真, 因此难度是被刻意降低了的, 你不需要进行架构设计层面的思考以及对应代码的编写, 只需要补全作者挖空的关键函数。</p>
 <p>因此，如果你一味地完成<code>Lab</code>的代码, 却缺乏对作者给出思考题的理解, 那么你对本实验项目的理解可能是不到位的, 即你知道这么设计的代码能正常运行, 但却不知道他为什么这么设计。</p>
 </blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="阶段1-engine-基础功能"><a class="header" href="#阶段1-engine-基础功能">阶段1-Engine 基础功能</a></h1>
+<p>在这一阶段中, 你将实现最基本的<code>LSM Tree</code>存储引擎的<code>CRUD</code>接口, 在之后的阶段二中你将实现性能优化部分的内容。</p>
+<p>阶段一的内容包括：</p>
+<ul>
+<li>数据的写入 &amp;&amp; <code>SST文件</code>的构造</li>
+<li><code>SST文件</code>的加载 &amp;&amp; 数据查询</li>
+</ul>
+<blockquote>
+<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
+<pre><code class="language-bash">git pull origin lab
+git checkout your_branch
+git merge lab
+</code></pre>
+<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-41-engine-的写入"><a class="header" href="#lab-41-engine-的写入">Lab 4.1 Engine 的写入</a></h1>
+<h1 id="1-概述-7"><a class="header" href="#1-概述-7">1 概述</a></h1>
+<p>与之前的模块不同, <code>LSMEngine</code>部分我们不打算按照<code>CRUD</code>迭代器的顺序进行实验, 因为其<code>Put</code>操作包含了<code>SST</code>的构建流程, 而<code>Get</code>操作是对已经构建的<code>SST</code>进行查询, 因此, 本章的<code>Lab</code>以<code>SST</code>的生命周期为线索, 逐步实现<code>Lab</code>, 这样的设计也有助于你对上层组件运行调度机制的理解。</p>
+<p>话不多说，我们先来看看<code>Engine</code>的头文件定义, 然后结合理论知识, 介绍<code>put</code>流程和<code>sst</code>的构建流程</p>
+<pre><code class="language-cpp">class Level_Iterator;
+
+class LSMEngine : public std::enable_shared_from_this&lt;LSMEngine&gt; {
+public:
+  std::string data_dir;
+  MemTable memtable;
+  std::map&lt;size_t, std::deque&lt;size_t&gt;&gt; level_sst_ids;
+  std::unordered_map&lt;size_t, std::shared_ptr&lt;SST&gt;&gt; ssts;
+  std::shared_mutex ssts_mtx;
+  std::shared_ptr&lt;BlockCache&gt; block_cache;
+  size_t next_sst_id = 0; // 下一个要分配的 sst id
+  size_t cur_max_level = 0; // 当前最大的 level
+};
+
+class LSM {
+private:
+  std::shared_ptr&lt;LSMEngine&gt; engine;
+  std::shared_ptr&lt;TranManager&gt; tran_manager_; // 本Lab不需要关注
+};
+</code></pre>
+<p>这里, 我们使用了<code>LSM</code>包裹了<code>LSMEngine</code>, <code>LSMEngine</code>是你要补全函数实现的类, 其中定义了<code>memtable</code>, <code>level_sst_ids</code>, <code>ssts</code>, <code>block_cache</code>, <code>next_sst_id</code>, <code>cur_max_level</code>等成员变量。这里比较重要的包括:</p>
+<ul>
+<li><code>level_sst_ids</code>: 从<code>level</code>到这一层的<code>sst_id</code>数组, 每一个<code>SST</code>由一个<code>sst_id</code>唯一表示</li>
+<li><code>ssts</code>: <code>sst_id</code>到<code>SST</code>的映射</li>
+<li><code>next_sst_id</code>: <code>SST</code>的<code>id</code>分配器, <code>LSMEngine</code>在<code>flush</code>形成行的<code>SST</code>时, 会分配一个<code>sst_id</code>给<code>SST</code>, 然后将<code>sst_id</code>和<code>SST</code>映射关系存入<code>ssts</code>中, <code>next_sst_id</code>就是<code>sst_id</code>的分配器, 每次分配<code>sst_id</code>时, <code>next_sst_id</code>都会自增1</li>
+<li><code>cur_max_level</code>: 顾名思义, 就是当前<code>SST</code>的最大的<code>level</code></li>
+<li><code>data_dir</code>: <code>LSMEngine</code>的<code>data_dir</code>, 即数据文件的存储位置, 这个参数我们在单元测试中会进行指定, <code>SST</code>文件需要存放在这个目录下</li>
+<li><code>MemTable</code>: 即整个<code>LSM Tree</code>引擎的内存表部分</li>
+</ul>
+<p>剩下的成员变量:</p>
+<ul>
+<li><code>ssts_mtx</code>: 全局的<code>sst文件</code>的访问锁, 这里是一个读写锁, 当然这个变量不是必须的, 你可以按照自己的理解实现并发控制策略(不过建议使用这个变量)</li>
+<li><code>block_cache</code>: 全局的缓存池指针, 你实现缓存池之前, 默认其为<code>nullptr</code>即可</li>
+</ul>
+<blockquote>
+<p>这里的<code>l0_sst_ids</code>记录了所有<code>sst</code>的<code>id</code>, 其排序是从大到小, 因为<code>sst</code>的<code>id</code>越大表示这个<code>sst</code>越新, 需要优先查询。</p>
+<p>可以使用<code>l0_sst_ids</code>获取的<code>id</code>从哈希表<code>ssts</code>中查询<code>SST</code>的描述类(类似于文件描述符)。</p>
+</blockquote>
+<h1 id="2-写入删除流程"><a class="header" href="#2-写入删除流程">2 写入/删除流程</a></h1>
+<p>结合刚刚对类的成员变量定义的简单介绍, 我们再次回顾一下<code>LSM Tree</code>的读写流程:</p>
+<ol>
+<li>写入<code>MemTable</code>:
+<ol>
+<li>如果写入的<code>KV</code>的<code>value</code>为空, 表示一个删除标记</li>
+<li>直接调用成员变量<code>memtable</code>的接口即可</li>
+<li>同样有批量接口和单次操作的接口</li>
+</ol>
+</li>
+<li>若当前活跃的<code>MemTable</code>大小达到阈值, 则将其冻结
+<ol>
+<li>这一部分已经在<code>MemTable</code>中实现, 你无需再实现</li>
+</ol>
+</li>
+<li>若冻结的<code>MemTable</code>容量达到阈值, 则将最早冻结的<code>MemTable</code>转为<code>SST</code>
+<ol>
+<li>判断<code>MemTable</code>容量并决定是否刷盘是你需要在本小节<code>Lab</code>进行实现的内容之一</li>
+<li><code>SST</code>文件的设计是每一层的<code>SST文件</code>数量不能超过指定阈值, 因此你刷盘的<code>Level 0</code>的<code>SST</code>文件可能会哦触发<code>Level 0</code>和<code>Level 1</code>的<code>SST</code>文件的<code>compact</code>, 不过这一任务没有放在<code>Lab 4.1</code>, <code>Lab4.1</code>中你当做就只有<code>Level 0</code>这一个层级即可</li>
+</ol>
+</li>
+</ol>
+<p>因此, 本小节<code>Lab</code>的核心就是整合之前创建的<code>MemTable</code>, <code>SST</code>, <code>Block</code>, <code>Iterator</code>, 并调用接口实现对外服务的功能</p>
+<h1 id="3-代码实现"><a class="header" href="#3-代码实现">3 代码实现</a></h1>
+<p>本小节你需要更改的代码文件为:</p>
+<ul>
+<li><code>src/lsm/engine.cpp</code></li>
+<li><code>include/lsm/engine.h</code></li>
+</ul>
+<h2 id="31-put--remove"><a class="header" href="#31-put--remove">3.1 Put &amp;&amp; Remove</a></h2>
+<p>你首先需要实现<code>put</code>函数, <code>put</code>函数肯定是操纵<code>memtable</code>成员变量, 另外你也需要根据其容量接口函数判断什么时候需要进行<code>flush</code>操作:</p>
+<pre><code class="language-cpp">uint64_t LSMEngine::put(const std::string &amp;key, const std::string &amp;value,
+                        uint64_t tranc_id) {
+  // TODO: Lab 4.1 插入
+  // ? 由于 put 操作可能触发 flush
+  // ? 如果触发了 flush 则返回新刷盘的 sst 的 id
+  // ? 在没有实现  flush 的情况下，你返回 0即可
+  return 0;
+}
+uint64_t LSMEngine::remove(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab 4.1 删除
+  // ? 在 LSM 中，删除实际上是插入一个空值
+  // ? 由于 put 操作可能触发 flush
+  // ? 如果触发了 flush 则返回新刷盘的 sst 的 id
+  // ? 在没有实现  flush 的情况下，你返回 0即可
+  return 0;
+}
+</code></pre>
+<p>这个函数的最终版本需要调用<code>flush</code>进行刷盘, 因此建议你将次函数和后面的<code>flush</code>函数一起实现。</p>
+<p>此时你仍然可以忽略<code>tranc_id</code>, 将其传递到接口的参数即可。至于返回值<code>uint64_t</code>, 你现阶段返回0即可。</p>
+<blockquote>
+<p>额外说明, 这里说明一下为什么返回值是<code>uint64_t</code>，而不是<code>void</code>, 这主要是为后续的事务准备的, 刷盘意味着事务操作的持久化完成, 因此需要更新已经成功持久化的最大事务<code>id</code>, 也就是这里的返回值。如果你现在看不懂也没关系, 到实现事务的<code>Lab</code>就明白了。</p>
+</blockquote>
+<p>根据之前部分描述, 此时你可以简化刷盘部分的逻辑, 即默认现在只有<code>Level 0</code>的<code>SST文件</code>, <code>SST文件</code>不会进行<code>Compact</code>形成新的<code>Level</code></p>
+<h2 id="32-put_batch--remove_batch"><a class="header" href="#32-put_batch--remove_batch">3.2 put_batch &amp;&amp; remove_batch</a></h2>
+<p>和<code>put/remove</code>函数的逻辑几乎一样, 只是写入时是批量数据:</p>
+<pre><code class="language-cpp">uint64_t LSMEngine::put_batch(
+    const std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; &amp;kvs,
+    uint64_t tranc_id) {
+  // TODO: Lab 4.1 批量插入
+  // ? 由于 put 操作可能触发 flush
+  // ? 如果触发了 flush 则返回新刷盘的 sst 的 id
+  // ? 在没有实现  flush 的情况下，你返回 0即可
+  return 0;
+}
+
+uint64_t LSMEngine::remove_batch(const std::vector&lt;std::string&gt; &amp;keys,
+                                 uint64_t tranc_id) {
+  // TODO: Lab 4.1 批量删除
+  // ? 在 LSM 中，删除实际上是插入一个空值
+  // ? 由于 put 操作可能触发 flush
+  // ? 如果触发了 flush 则返回新刷盘的 sst 的 id
+  // ? 在没有实现  flush 的情况下，你返回 0即可
+  return 0;
+}
+</code></pre>
+<h2 id="33-flush"><a class="header" href="#33-flush">3.3 Flush</a></h2>
+<p><code>flush</code>函数会将<code>MemTable</code>中<code>frozen_tables</code>中最旧的一个跳表的数据刷盘，并返回刷盘过程中提取的统计信息<code>tranc_id</code>, 现阶段你只需要返回0即可。</p>
+<blockquote>
+<p><strong>Hint</strong>:
+<code>flush()</code>的返回值是和<code>put()</code>等接口的返回值一致的</p>
+</blockquote>
+<pre><code class="language-cpp">uint64_t LSMEngine::flush() {
+  // TODO: Lab 4.1 刷盘形成sst文件
+  return 0;
+}
+</code></pre>
+<p><code>flush</code>函数应该是这一小节的关键函数了, 这里的逻辑就是从<code>memtable</code>的接口将最旧的跳表刷盘城<code>SST</code>文件, 这里涉及到文件<code>IO</code>的操作时, 推荐使用作者定义好的辅助类<code>FileObj</code>, 其定义在<code>include/utils/files.h</code>中, 如果你有兴趣, 也可以看看``include/utils`中定义的其他工具类及其实现。</p>
+<p>最后，<code>SST文件</code>的命名格式已经在<code>get_sst_path</code>中进行了详细的说明:</p>
+<pre><code class="language-cpp">std::string LSMEngine::get_sst_path(size_t sst_id, size_t target_level) {
+  // sst的文件路径格式为: data_dir/sst_&lt;sst_id&gt;.&lt;level&gt;，sst_id格式化为32位数字
+  std::stringstream ss;
+  ss &lt;&lt; data_dir &lt;&lt; "/sst_" &lt;&lt; std::setfill('0') &lt;&lt; std::setw(32) &lt;&lt; sst_id
+     &lt;&lt; '.' &lt;&lt; target_level;
+  return ss.str();
+}
+</code></pre>
+<blockquote>
+<p>后缀标记了这个<code>SST文件</code>所属的<code>Level</code>, 在你实现<code>Compact</code>前, 这个后缀设置为0即可</p>
+</blockquote>
+<p><strong>你必须严格遵守<code>SST</code>文件格式的命名规范, 如果你采用自己的文件命名方式, 那么请自行修改对应的单元测试函数(非常不推荐)。</strong></p>
+<h1 id="4-测试-2"><a class="header" href="#4-测试-2">4 测试</a></h1>
+<p>由于我们目前仅实现了写入模块, 测试函数无法从引擎读取数据, 因此本小节没有单元测试, 当你实现<a href="lab4/./lab4.2-Engine-read.html">Lab 4.2 Engine 的读取</a>后会进行统一的单元测试。</p>
+<h1 id="5-思考"><a class="header" href="#5-思考">5 思考</a></h1>
+<p>现在请先思考一下几个问题，然后开启<a href="lab4/./lab4.2-Engine-read.html">Lab 4.2 Engine 的读取</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-42-engine-的读取"><a class="header" href="#lab-42-engine-的读取">Lab 4.2 Engine 的读取</a></h1>
+<h1 id="1-概述-8"><a class="header" href="#1-概述-8">1 概述</a></h1>
+<p>从之前 <a href="lab4/./lab4.1-Engine-write.html">Lab 4.1 Engine 的写入</a>中, 我们已经实现了<code>SST</code>的构建流程, 这一章我们将实现<code>Engine</code>的读取流程。(这里的读取还包括引擎的初始化流程中对<code>SST文件</code>的读取)</p>
+<p>同样地, 我们想从逻辑上梳理引擎的读取和查询流程:</p>
+<p><strong>1 存储引擎启动时</strong></p>
+<p>遍历<code>data_dir</code>下的<code>SST</code>文件, 将<code>SST</code>文件的元信息加载到内存中</p>
+<p><strong>2 接受查询请求</strong></p>
+<ol>
+<li>查询当前活跃的<code>MemTable</code>, 如果查到有效记录或删除记录, 则返回</li>
+<li>若查询当前活跃的<code>MemTable</code>未命中, 则遍历冻结的<code>MemTable</code>, 由于冻结的<code>MemTable</code>也存在次序, 需要先查询最近冻结的<code>MemTable</code></li>
+<li>若查询冻结的<code>MemTable</code>未命中, 则遍历<code>SST</code>, 由于<code>SST</code>也存在次序, 需要先查询最近创建的<code>SST</code>
+<ol>
+<li><code>SST</code>的顺序先按照<code>Level</code>排序, <code>Level</code>越低的<code>SST</code>越新, 需要先查询</li>
+<li>相同<code>Level</code>的<code>SST</code>按照<code>sst_id</code>排序, 这里的逻辑有所不同:
+<ol>
+<li>如果是<code>Level 0</code>的<code>SST</code>, 则按照<code>sst_id</code>排序, 从大到小查询, 越大的<code>sst_id</code>表示这个<code>SST</code>越新, 需要有限查询</li>
+<li>如果是其他<code>Level</code>以上的<code>SST</code>, 其所有的<code>SST</code>的<code>key</code>都是有序分布且不重叠的, 既然<code>key</code>不重叠也就无所谓谁的优先级更高、谁会覆盖谁的<code>key</code>, 可以采用二分查询实现更高的效率, 下面是一个<code>SST文件</code>的案例:
+<pre><code class="language-bash">Level 0: sst_15(key000-key050), sst_14(key005-key030), sst_13(key020-key040)
+Level 1: sst_10(key100-key120), sst_11(key121-key140), sst_12(key141-key160)
+Level 2: sst_08(key100-key120), sst_09(key121-key140)
+</code></pre>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>整个<code>SST</code>文件遍历完成后, 若仍未命中, 则返回空指针表示<code>key</code>没有找到</li>
+</ol>
+<blockquote>
+<p><strong>补充</strong></p>
+<ul>
+<li>在后续实现<code>WAL</code>后, 在上述所有流程前, 会有一个对<code>WAL</code>日志进行检查并实现崩溃恢复的流程</li>
+</ul>
+</blockquote>
+<h1 id="2-代码实现-4"><a class="header" href="#2-代码实现-4">2 代码实现</a></h1>
+<p>本小节你需要更改的代码文件为:</p>
+<ul>
+<li><code>src/lsm/engine.cpp</code></li>
+<li><code>include/lsm/engine.h</code></li>
+</ul>
+<h2 id="21-引擎的初始化"><a class="header" href="#21-引擎的初始化">2.1 引擎的初始化</a></h2>
+<p>上一章<a href="lab4/./lab4.1-Engine-write.html">Lab 4.1 Engine 的写入</a>中, 我们在<code>put</code>操作中惰性触发了<code>SST</code>的刷盘操作, 因此在<code>Engine</code>启动时, 我们需要遍历<code>data_dir</code>下的<code>SST</code>文件, 将<code>SST</code>文件的元信息加载到内存中, 以便后续的查询操作:</p>
+<pre><code class="language-cpp">LSMEngine::LSMEngine(std::string path) : data_dir(path) {
+  // 初始化日志
+  init_spdlog_file();
+
+  // TODO: Lab 4.2 引擎初始化
+}
+</code></pre>
+<p><strong>说明</strong></p>
+<ol>
+<li>后续实现缓存池后, 构造函数中需要对缓存池进行初始化, 现阶段你的构造函数, 只需要将<code>block_cache</code>初始化为<code>nullptr</code>即可</li>
+<li>第一次启动引擎时, 需要创建数据目录</li>
+<li><code>init_spdlog_file</code>函数用于初始化日志, 其内部是对<code>std::call_once</code>的封装, 因此其只有第一次调用时会执行</li>
+</ol>
+<blockquote>
+<p><strong>Hint</strong></p>
+<ol>
+<li>你需要从<code>SST文件</code>的命名格式中对<code>next_sst_id</code>和<code>cur_max_level</code>进行更新</li>
+<li><code>level_sst_ids</code>映射的数组需要你自己维护其优先级顺序, 不同<code>Level</code>的<code>SST</code>文件优先级可能不同, 现在你不需要关心<code>Level 0</code>以外的<code>SST</code></li>
+</ol>
+</blockquote>
+<h2 id="22-查询接口"><a class="header" href="#22-查询接口">2.2 查询接口</a></h2>
+<h3 id="221-get"><a class="header" href="#221-get">2.2.1 get</a></h3>
+<pre><code class="language-cpp">std::optional&lt;std::pair&lt;std::string, uint64_t&gt;&gt;
+LSMEngine::get(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab 4.2 查询
+
+  return std::nullopt;
+}
+</code></pre>
+<p>这里传入的<code>uint64_t tranc_id</code>是为了在实现事务功能后控制不同事务的可见性的, 也就是实现事务基础属性中的<strong>隔离性</strong>, 现阶段你可以忽略它</p>
+<p>此外, 这里的返回值是一个由<code>optional</code>包裹的<code>pair</code>, <code>pair</code>的第一个元素是<code>value</code>, 第二个元素是<code>tranc_id</code>, <code>value</code>表示查询到的值, <code>tranc_id</code>表示这个键值对最新的修改事务的的<code>tranc_id</code>(现阶段同样可以忽略), 如果查询不到, 则返回<code>std::nullopt</code></p>
+<h3 id="222-get_batch"><a class="header" href="#222-get_batch">2.2.2 get_batch</a></h3>
+<pre><code class="language-cpp">std::vector&lt;
+    std::pair&lt;std::string, std::optional&lt;std::pair&lt;std::string, uint64_t&gt;&gt;&gt;&gt;
+LSMEngine::get_batch(const std::vector&lt;std::string&gt; &amp;keys, uint64_t tranc_id) {
+  // TODO: Lab 4.2 批量查询
+
+  return {};
+}
+</code></pre>
+<p>没啥好说的, 就是在<code>get</code>的基础上变成了批量查询</p>
+<h3 id="223-sst_get_"><a class="header" href="#223-sst_get_">2.2.3 sst_get_</a></h3>
+<p>通过后缀你可以看出, 这个查询是专门在<code>SST</code>中进行查询的接口, 其<code>_</code>表示这个函数是不需要进行加锁操作的, 其加锁逻辑是其他上层组件控制的:</p>
+<pre><code class="language-cpp">std::optional&lt;std::pair&lt;std::string, uint64_t&gt;&gt;
+LSMEngine::sst_get_(const std::string &amp;key, uint64_t tranc_id) {
+  // TODO: Lab 4.2 sst 内部查询
+  return std::nullopt;
+}
+</code></pre>
+<blockquote>
+<p>思考: 什么情况下会单独对<code>SST</code>部分进行查询?</p>
+</blockquote>
+<h1 id="3-测试-5"><a class="header" href="#3-测试-5">3 测试</a></h1>
+<p>完成<a href="lab4/./lab4.1-Engine-write.html">Lab 4.1 Engine 的写入</a>和本节<code>Lab</code>后, 你应该能通过<code>test/test_lsm.cpp</code>中<code>IteratorOperations</code>前的所有单元测试:</p>
+<pre><code class="language-bash">✗ xmake
+[100%]: build ok, spent 1.936s
+✗ xmake run test_lsm
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from LSMTest
+[ RUN      ] LSMTest.BasicOperations
+[       OK ] LSMTest.BasicOperations (0 ms)
+[ RUN      ] LSMTest.Persistence
+[       OK ] LSMTest.Persistence (228 ms)
+[ RUN      ] LSMTest.LargeScaleOperations
+[       OK ] LSMTest.LargeScaleOperations (1 ms)
+[ RUN      ] LSMTest.MixedOperations
+[       OK ] LSMTest.MixedOperations (0 ms)
+[ RUN      ] LSMTest.IteratorOperations
+unknown file: Failure
+C++ exception with description "Not implemented" thrown in the test body.
+
+[  FAILED  ] LSMTest.IteratorOperations (0 ms)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="阶段2-迭代器--compact"><a class="header" href="#阶段2-迭代器--compact">阶段2-迭代器 &amp;&amp; Compact</a></h1>
+<h2 id="子任务1-迭代器"><a class="header" href="#子任务1-迭代器">子任务1-迭代器</a></h2>
+<p>之前你已经完成了具备初步的简单<code>CURD</code>操作的<code>LSM Tree</code>存储引擎, 但你应该发现了, 诸如范围查询、全局迭代器等功能，我们并没有放在 <a href="lab4/./Engine-Base.html">第一阶段</a>, 这是因为以上接口都需要不同组件之间(不同<code>Level</code>的<code>SST</code>和<code>MemTable</code>)进行交互, 而这些组件之间的交互需要我们实现更高级的迭代器才可以完成, 因此这一小节你将实现各种迭代器。</p>
+<p>你需要实现的迭代器包括：</p>
+<ul>
+<li><code>TwoMergeIterator</code>
+<ul>
+<li>其主要用于整合2个迭代器, 按照不同的优先级顺序对迭代器进行遍历</li>
+<li>这里的两个迭代器通常情况下就是内存<code>MemTable</code>的迭代器和<code>SST</code>部分的迭代器, 前者优先级更高</li>
+</ul>
+</li>
+<li><code>ConcactIterator</code>
+<ul>
+<li>用于连接某一层<code>Level</code>的多个<code>SST</code></li>
+<li>此处默认多个<code>SST</code>是不重叠且排序的, 因此使用于<code>Level &gt; 0</code>的<code>SST</code>的连接</li>
+</ul>
+</li>
+<li><code>LevelIterator</code>
+<ul>
+<li>类似<code>TwoMergeIterator</code>, 但整合的迭代器数量更多</li>
+<li>例如, 每个<code>Level</code>都有一个层间的迭代器</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>提示: 强烈建议你自己创建一个分组实现<code>Lab</code>的内容, 并在每次新的<code>Lab</code>开始时进行如下同步操作:</p>
+<pre><code class="language-bash">git pull origin lab
+git checkout your_branch
+git merge lab
+</code></pre>
+<p>如果你发现项目仓库的代码没有指导书中的 TODO 标记的话, 证明你需要运行上述命令更新代码了</p>
+</blockquote>
+<p><strong>思考</strong>
+为什么我们要在实现<code>Compact</code>之前先实现这些迭代器?</p>
+<h2 id="子任务2-compact"><a class="header" href="#子任务2-compact">子任务2-Compact</a></h2>
+<p>这里的<code>Compact</code>操作需要我们的迭代器作为信息交互的接口, 具体原因请参见<a href="lab4/./lab4.3-ConcactIterator.html">Lab 4.3 ConcactIterator
+</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-43-concactiterator"><a class="header" href="#lab-43-concactiterator">Lab 4.3 ConcactIterator</a></h1>
+<h1 id="1-概述-9"><a class="header" href="#1-概述-9">1 概述</a></h1>
+<p>其实这一章出现在这里是有一点突兀的, 照理说我们正常实现基础<code>LSMEngine</code>的下一个步骤是<code>Compact</code>。讲到这里我们接得知道<code>Compact</code>的逻辑了。</p>
+<p>这里用一个具体案例进行讲解。</p>
+<p>我们假设此时的<code>SST</code>状态是这样的:</p>
+<pre><code class="language-bash">Level 0: sst_15(key000-key050), sst_14(key005-key030), sst_13(key020-key040)
+Level 1: sst_10(key100-key120), sst_11(key121-key140), sst_12(key141-key160)
+Level 2: sst_08(key100-key120), sst_09(key121-key140)
+</code></pre>
+<p>我们对每一层的<code>SST</code>需要进行限制, 当这一层的<code>SST</code>数量超过阈值时, 我们需要将这一层所有的<code>SST</code>进行<code>Compact</code>到下一层。</p>
+<p>在这个案例中, 我们下一次<code>flush</code>刷盘后, 假设得到了一个<code>Level 0</code>的<code>SST</code>为<code>sst_16(key060-key080)</code>, 那么此时<code>Level 0</code>的<code>SST</code>数量超过了阈值4(这个是是假定的, 实际上是可在<code>config.toml</code>中配置的), 我们需要将<code>Level 0</code>的<code>SST</code>进行<code>sst_16, sst_15, sst_14, sst_13</code>到<code>Level 1</code>。但我们新<code>Compact</code>的<code>SST</code>会和<code>Level 1</code>本来的<code>SST</code>的<code>key</code>存在范围重叠, 这是不允许的, 所以实际上, 我们是将原来的<code>Level 0</code>和旧的<code>Level 1</code>的所有<code>SST</code>一并进行重新整理<code>Compact</code>形成新的<code>Level 1 SST</code>, 这里实际上就是用迭代器将2个<code>Level</code>的迭代器进行串联, 遍历这个迭代器, 逐一构建新的<code>Level 1</code>的<code>SST</code>, 那么是怎么个串联法呢?</p>
+<ol>
+<li>首先, <code>Level 0</code>的<code>SST</code>之间存在<code>key</code>的重叠, 需要进行去重, 这里我们可以复用已有的<code>HeapIterator</code>, 见<a href="lab4/../lab2/lab2.2-iterator.html">Lab 2.2 迭代器</a></li>
+<li>其次就是我们将要实现的<code>ConcactIterator</code>, 这个迭代器会串联<code>Level 1</code>的所有<code>SST</code>形成层间迭代器</li>
+<li>最后就是之后小节实现的<code>TwoMergeIterator</code>, 这个迭代器会串联<code>HeapIterator</code>和<code>ConcactIterator</code>, 按照优先级对迭代器进行输出, 遍历<code>TwoMergeIterator</code>即可构建新的<code>Level 1</code>的<code>SST</code></li>
+</ol>
+<blockquote>
+<p><strong>Question</strong></p>
+<p>如果<code>Compact</code>发生的<code>Level</code>不是<code>Level 0</code>和<code>Level 1</code>, 而是<code>Level x</code>和<code>Level y</code>(<code>x&gt;0</code>)呢?</p>
+<p>答案显而易见, 还是用<code>TwoMergeIterator</code>对2个<code>Level</code>的层间迭代器进行遍历, 遍历过程中构造新的<code>Level y</code>的<code>SST</code>。只是<code>TwoMergeIterator</code>中包裹的<code>Level x</code>的迭代器从<code>HeapIterator</code>变成了<code>ConcactIterator</code>。</p>
+</blockquote>
+<p>这一小节我们先实现<code>ConcactIterator</code>。</p>
+<h1 id="2-代码实现-5"><a class="header" href="#2-代码实现-5">2 代码实现</a></h1>
+<p>你需要修改的文件:</p>
+<ul>
+<li><code>src/sst/concact_iterator.cpp</code></li>
+<li><code>include/sst/concact_iterator.h</code> (Optional)</li>
+</ul>
+<h2 id="21-头文件分析"><a class="header" href="#21-头文件分析">2.1 头文件分析</a></h2>
+<p>按照惯例, 我们简单分析下头文件定义:</p>
+<pre><code class="language-cpp">class ConcactIterator : public BaseIterator {
+private:
+  SstIterator cur_iter;
+  size_t cur_idx; // 不是真实的sst_id, 而是在需要连接的sst数组中的索引
+  std::vector&lt;std::shared_ptr&lt;SST&gt;&gt; ssts;
+  uint64_t max_tranc_id_;
+};
+</code></pre>
+<p>这里的<code>ssts</code>就是这一层所有<code>SST</code>句柄的数组, <code>cur_idx</code>是当前迭代器指向的<code>SST</code>在<code>ssts</code>中的索引, <code>cur_iter</code>是当前<code>cur_idx</code>指向的<code>SST</code>的迭代器。</p>
+<p><code>max_tranc_id_</code>是调用这个迭代器的事务<code>id</code>, 也就是其最大的事务可见范围, 现在你不需要实现。</p>
+<h2 id="22-concactiterator-实现"><a class="header" href="#22-concactiterator-实现">2.2 ConcactIterator 实现</a></h2>
+<p>这一章由于我们先介绍了<code>Compact</code>过程中的逻辑, 因此就先实现最简单的一个<code>ConcactIterator</code>:</p>
+<pre><code class="language-cpp">BaseIterator &amp;ConcactIterator::operator++() {
+  // TODO: Lab 4.3 自增运算符重载
+  return *this;
+}
+
+bool ConcactIterator::operator==(const BaseIterator &amp;other) const {
+  // TODO: Lab 4.3 比较运算符重载
+  return false;
+}
+
+bool ConcactIterator::operator!=(const BaseIterator &amp;other) const {
+  // TODO: Lab 4.3 比较运算符重载
+  return false;
+}
+
+ConcactIterator::value_type ConcactIterator::operator*() const {
+  // TODO: Lab 4.3 解引用运算符重载
+  return value_type();
+}
+ConcactIterator::pointer ConcactIterator::operator-&gt;() const {
+  // TODO: Lab 4.3 -&gt;运算符重载
+  return nullptr;
+}
+</code></pre>
+<p>这里基本上都是实现迭代器的运算符重载函数, 算是比较简单的一个小<code>Lab</code></p>
+<h1 id="3-测试-6"><a class="header" href="#3-测试-6">3 测试</a></h1>
+<p>本小节没有测试, 你完成后续迭代器和涉及迭代器的查询操作后有统一的单元测试。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-44-twomergeiterator"><a class="header" href="#lab-44-twomergeiterator">Lab 4.4 TwoMergeIterator</a></h1>
+<h1 id="1-概述-10"><a class="header" href="#1-概述-10">1 概述</a></h1>
+<p>根据上一节<a href="lab4/./lab4.3-ConcactIterator.html">Lab 4.3 ConcactIterator</a>中对<code>TwoMergeIterator</code>的介绍, <code>TwoMergeIterator</code>就是整合两个优先级不同的迭代器, 生成一个新的迭代器, 该迭代器优先级为两个迭代器中优先级较高的那个。</p>
+<p>其余逻辑上一节<a href="lab4/./lab4.3-ConcactIterator.html">Lab 4.3 ConcactIterator</a>已经有所介绍, 这里不再赘述, 直接开始看头文件定义:</p>
+<pre><code class="language-cpp">class TwoMergeIterator : public BaseIterator {
+private:
+  std::shared_ptr&lt;BaseIterator&gt; it_a;
+  std::shared_ptr&lt;BaseIterator&gt; it_b;
+  bool choose_a = false;
+  mutable std::shared_ptr&lt;value_type&gt; current; // 用于存储当前元素
+  uint64_t max_tranc_id_ = 0;
+};
+</code></pre>
+<p>这里也很简单, 就只是存储两个迭代器 的指针<code>it_a</code>和<code>it_b</code>, 以及一个<code>choose_a</code>用于标记当前是否选择了优先级较高的<code>it_a</code>迭代器是, 一个<code>current</code>用于缓存当前迭代器位置的键值对, 一个<code>max_tranc_id_</code>用于记录当前可见事务的最大<code>id</code>。</p>
+<h1 id="2-代码实现-6"><a class="header" href="#2-代码实现-6">2 代码实现</a></h1>
+<h2 id="21-运算符重载"><a class="header" href="#21-运算符重载">2.1 运算符重载</a></h2>
+<pre><code class="language-cpp">BaseIterator &amp;TwoMergeIterator::operator++() {
+  // TODO: Lab 4.4: 实现 ++ 重载
+}
+
+bool TwoMergeIterator::operator==(const BaseIterator &amp;other) const {
+  // TODO: Lab 4.4: 实现 == 重载
+  return false;
+}
+
+bool TwoMergeIterator::operator!=(const BaseIterator &amp;other) const {
+  // TODO: Lab 4.4: 实现 != 重载
+  return false;
+}
+
+BaseIterator::value_type TwoMergeIterator::operator*() const {
+  // TODO: Lab 4.4: 实现 * 重载
+  return {};
+}
+
+TwoMergeIterator::pointer TwoMergeIterator::operator-&gt;() const {
+  // TODO: Lab 4.4: 实现 -&gt; 重载
+  return nullptr;
+}
+</code></pre>
+<p>老套路, 你需要先实现迭代器的各个运算符重载函数, 不过建议你看看下面的辅助函数, 你在实现这些运算符重载函数的时候会用到这些辅助函数, 不妨一起实现了。</p>
+<h2 id="22-辅助函数"><a class="header" href="#22-辅助函数">2.2 辅助函数</a></h2>
+<p>首先<code>choose_it_a</code>判断当前解引用应该使用哪个迭代器:</p>
+<pre><code class="language-cpp">bool TwoMergeIterator::choose_it_a() {
+  // TODO: Lab 4.4: 实现选择迭代器的逻辑
+  return false;
+}
+</code></pre>
+<p>然后是更新当前缓存值的函数:</p>
+<pre><code class="language-cpp">void TwoMergeIterator::update_current() const {
+  // TODO: Lab 4.4: 实现更新缓存键值对的辅助函数
+}
+</code></pre>
+<p>这个函数你可能会在之前的自增运算符和<code>-&gt;</code>运算符重载中调用</p>
+<p>最后这个函数是根据事务可见性进行滤除的辅助函数, 当前不需要实现, 只是标记下便于你之后的<code>Lab</code>来更新:</p>
+<pre><code class="language-cpp">void TwoMergeIterator::skip_by_tranc_id() {
+  // TODO: Lab xx
+}
+</code></pre>
+<h1 id="3-测试-7"><a class="header" href="#3-测试-7">3 测试</a></h1>
+<p>本小节没有测试, 你完成后续迭代器和涉及迭代器的查询操作后有统一的单元测试。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-45-compact"><a class="header" href="#lab-45-compact">Lab 4.5 Compact</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-46-level_iterator"><a class="header" href="#lab-46-level_iterator">Lab 4.6 Level_Iterator</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><p>TODO</p>
 
                     </main>
